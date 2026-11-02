@@ -41,6 +41,20 @@
         <button class="btn small" id="zk-subject-save" style="margin-top:10px;">保存选科</button>
       </div>
       <div class="card">
+        <h3>考研科目合集</h3>
+        <p class="muted">进入课表轮转的考研科目，至少 1 门；408 按数据结构/组成/OS/网络四门子科自动轮转。</p>
+        <div class="check-list" id="ky-subject-list" style="margin-top:10px;"></div>
+        <button class="btn small" id="ky-subject-save" style="margin-top:10px;">保存考研合集</button>
+      </div>
+      <div class="card">
+        <h3>优先科目（每天第 1 节）</h3>
+        <p class="muted">从当前课程合集（自考 + 考研）中选一门，固定排在每天上午第 1 节（9:00–10:30）；其余节次按周轮转。选择保存后课表立即自动重排。</p>
+        <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+          <select id="priority-select" style="min-width:220px;"></select>
+          <button class="btn small" id="priority-save">保存优先科目</button>
+        </div>
+      </div>
+      <div class="card">
         <h3>每周空白半日（至少一个）</h3>
         <p class="muted">引擎不在该时段排块。</p>
         <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
