@@ -19,13 +19,15 @@ heu-prep-site/
 ├── past-papers.html    历年真题合计（408 分年 2009—2026 + 自考真题 + exam100 爬虫目录 1117 套，计划内课程可离线查看）
 ├── paper-viewer.html   真题离线查看器（读取 papers/zikao/ 本地镜像图片）
 ├── notes.html          课程笔记（11 门 · 96 章 · 1171 条要点 + 411 条知识点详解逐章展开；公开网页摘录逐章溯源 + 知识库核对补充标注"含补充"，KaTeX 公式）
+├── materials.html      考前资料（源自 HEUOpenResource/heu-icicles 的历年题/练习题/课后题答案/复习资料/考点速记，按课程分组 + 文件名筛选 + GitHub 溯源链接；文件在 materials/）
 ├── math.html           高中数学零基础课程（高一到高三 19 章 · 96 小节大白话讲解 + 每步带"为什么"的例题 + SVG 图例 + 交互式章节测验，测验进度存 localStorage；数据在 js/math_data_a~e.js）
 ├── timeline.html       双轨时间线（confirmed/expected/tba 三种视觉样式）
 ├── schedule.html       日粒度滚动课表（引擎 A 自考 + 引擎 B 考研；自 2026-11-03 起排课，块含钟点时段）
 ├── quiz.html           刷题与错题本（仅显示来源自带答案）
 ├── study.html          番茄钟 + 打卡 + 学习看板（ECharts）+ Anki 导出
 ├── css/style.css       苹果官网风格设计系统
-├── js/                 data.js（权威数据源）+ deep.js（大纲逐章知识点/笔记考点深挖数据）+ notes_deep.js（课程笔记数据，window.NOTES_DEEP）+ papers.js + ai_float.js（全站悬浮 AI 助手，内嵌豆包）+ search.js（全站搜索引擎）+ 各页逻辑 + common.js
+├── js/                 data.js（权威数据源）+ deep.js（大纲逐章知识点/笔记考点深挖数据）+ notes_deep.js（课程笔记数据，window.NOTES_DEEP）+ papers.js + ai_float.js（全站悬浮 AI 助手，内嵌豆包）+ search.js（全站搜索引擎）+ materials_data.js（考前资料清单）+ 各页逻辑 + common.js
+├── materials/          考前资料本地镜像（按课程分目录，31 份文件，源自 HEUOpenResource/heu-icicles）
 ├── data/               zikao.json / kaoyan.json / timeline.json / site.json
 ├── _shared/js/echarts.min.js   本地图表库（零 CDN）
 ├── schedule_engine.md          双引擎课表设计文档
@@ -49,9 +51,10 @@ heu-prep-site/
 | 原创力文档 book118 | https://m.book118.com | 13013 高级语言程序设计真题 PDF（2011.10 / 2015.4，用户上传，共 2 份） |
 | 学赛网 xuesai / yun.sooce / zikao365 | https://img.xuesai.cn 等 | 00023 高等数学（工本）真题 PDF（2017.4 / 2019.4 / 2021.10，共 3 套） |
 | GitHub · neville-studio/408-exam-paper | https://github.com/neville-studio/408-exam-paper | 408 历年真题合集（2009—2026 分年试卷 + 答案）；本站刷题 27 题取自其 2023 年重排版试卷与配套答案 |
+| GitHub · HEUOpenResource/heu-icicles | https://github.com/HEUOpenResource/heu-icicles（哈尔滨工程大学课程攻略共享计划，站内博客 https://heu.us.kg/ ） | 考前资料板块：数据结构/操作系统/计算机网络/计组/微机原理与接口/离散数学/软件工程/数据库的历年题、练习题及答案、课后题答案、复习资料、考点速记（2026-11-03 按所需课程挑选 31 份拉取为本地镜像，每份附仓库原始链接） |
 | 研招网 · 考试大纲频道 | https://yz.chsi.com.cn/kyzx/kydg/ | 408 大纲公布入口；408 章节骨架以公开大纲章节为准 |
 
-**明确不收录**：“AI 电子书”、押题精华、考前速记、密押卷等二次加工内容；无原始试卷出处的商业题库条目；无法追溯公开 URL 的任何内容。
+**收录范围说明**：「考前资料」板块收录公开仓库中的原始课程资料与考前向二次加工内容（复习资料、划重点、考点速记、历年题等），均注明仓库来源与原始链接，并提示其与自考/考研大纲不完全一致、需结合大纲使用；除此之外的页面仍坚持来源可追溯原则，无法给出公开 URL 的内容一律不收录。
 
 ## Track 分区规则
 

@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   { href: "kaoyan.html", label: "考研专区" },
   { href: "past-papers.html", label: "历年真题" },
   { href: "notes.html", label: "课程笔记" },
+  { href: "materials.html", label: "考前资料" },
   { href: "math.html", label: "高中数学" },
   { href: "timeline.html", label: "时间线" },
   { href: "schedule.html", label: "课表" },
@@ -56,7 +57,7 @@ function renderFooter() {
   if (!el) return;
   el.innerHTML = `<div class="container">
     <p>课表由本站依据公开大纲/章节结构生成，供学习规划参考，不构成教学安排。</p>
-    <p>本站不收录“押题精华”“密押卷”“考前速记”等二次加工内容；所有资料均标注来源类型与完整 URL。数据快照日期：${SITE_DATA.meta.built_at}。</p>
+    <p>「考前资料」板块收录历年题、练习题、复习资料与考点速记等二次加工内容，全部取自公开仓库 HEUOpenResource/heu-icicles 并附原始链接；其余页面所有资料均标注来源类型与完整 URL。数据快照日期：${SITE_DATA.meta.built_at}。</p>
     <p>官方入口：<a href="https://www.lzk.hl.cn" target="_blank" rel="noopener">黑龙江省招生考试信息港</a> · <a href="https://yz.chsi.com.cn" target="_blank" rel="noopener">中国研究生招生信息网</a></p>
   </div>`;
 }

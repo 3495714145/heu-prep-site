@@ -72,6 +72,13 @@
       push("刷题", `${q.subject || ""} 第 ${q.qno || i + 1} 题`, q.stem || "", "quiz.html", q.track || "");
     });
 
+    /* 考前资料（HEUOpenResource/heu-icicles） */
+    (window.MATERIALS || []).forEach(g => {
+      g.items.forEach(it => {
+        push("考前资料", `${g.name} · ${it.name}`, `${g.id} ${g.origin} ${g.note || ""}`, "materials.html", g.track === "zikao" ? `自考 ${g.id}` : "哈工程课程");
+      });
+    });
+
     return idx;
   }
 

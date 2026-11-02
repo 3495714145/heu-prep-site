@@ -68,6 +68,8 @@
         <div class="cc-status">
           ${s ? `<span class="badge ok">官方大纲知识点</span>` : n ? `<span class="badge warnb">笔记考点</span>` : `<span class="badge miss">大纲暂缺</span>`}
           <a href="past-papers.html" class="badge ${pCount ? "ok" : "miss"}" style="text-decoration:none;">真题 ${pCount} 套</a>
+          ${window.materialCount && materialCount(c.code)
+            ? `<a href="materials.html" class="badge warnb" style="text-decoration:none;">考前资料 ${materialCount(c.code)} 份</a>` : ""}
         </div>`;
       if (s) {
         inner += syllabusHtml(c, s);
