@@ -20,15 +20,21 @@
   <section class="section container" id="ai-assistant">
     <div class="card">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <h3 style="margin:0;">AI 助手 · DeepSeek 网页版</h3>
-        <span class="badge code">新标签页打开</span>
+        <h3 style="margin:0;">AI 助手</h3>
+        <span class="badge ok">豆包可内嵌</span>
+        <span class="badge code">DeepSeek 仅新标签打开</span>
       </div>
-      <p class="muted" style="margin-top:8px;">DeepSeek 官网设置了 <span class="badge code">frame-ancestors 'none'</span> 禁止被网页嵌入，且本站为纯静态站无法反向代理，因此提供快速入口 + 备考预设提问词。点下面的按钮会先复制提问词再打开 DeepSeek，打开后粘贴（Ctrl+V）发送即可。</p>
+      <p class="muted" style="margin-top:8px;">豆包实测可嵌入本页（官方未强制禁止）；DeepSeek 设置了 <span class="badge code">frame-ancestors 'none'</span> 禁止嵌入，只能新标签页打开。点「提问词」按钮会先复制提问词、再展开内嵌豆包，在豆包输入框按 Ctrl+V 粘贴发送即可。</p>
       <div class="ai-row" style="margin-top:12px;">
-        <button class="ai-btn primary" data-ai-open="1">打开 DeepSeek（chat.deepseek.com）↗</button>
+        <button class="ai-btn primary" id="ai-embed-toggle">展开内嵌豆包 ▾</button>
+        <button class="ai-btn" data-ai-open="doubao">豆包新标签页 ↗</button>
+        <button class="ai-btn" data-ai-open="deepseek">DeepSeek 新标签页 ↗</button>
         <button class="ai-btn" data-ai-prompt="我是自考计算机（080901）+ 28 考研（数二/英二/408）考生。请就我下一条消息发你的知识点，出 5 道测试题，等我作答后逐题讲解并指出易错点。">提问词① 出题测验</button>
         <button class="ai-btn" data-ai-prompt="请用大白话讲解下面这个概念，把我当成完全零基础的学生，多打生活比方，最后给一个带完整步骤的小例子：">提问词② 零基础讲解</button>
         <button class="ai-btn" data-ai-prompt="下面是我的错题和当时的错误思路，请指出错因、给出正确解法，再出 2 道同类题让我巩固：">提问词③ 错题诊断</button>
+      </div>
+      <div id="ai-embed" style="display:none;margin-top:12px;">
+        <iframe id="ai-embed-frame" style="width:100%;height:72vh;border:1px solid var(--rule);border-radius:12px;background:#fff;" allow="clipboard-write; microphone" title="豆包内嵌面板"></iframe>
       </div>
       <p class="src" id="ai-hint" style="margin-top:10px;"></p>
     </div>
