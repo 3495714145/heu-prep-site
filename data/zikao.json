@@ -1,0 +1,532 @@
+{
+  "track": "zikao",
+  "courses_source": {
+    "title": "课程设置表（官方 18 项，含实践与论文）",
+    "source_url": "https://zxks.hljea.org.cn",
+    "source_platform": "黑龙江省招生考试信息港",
+    "verified_at": "2026-11-02"
+  },
+  "exam_rules": {
+    "sessions_per_year": "4 月、10 月各一次（黑龙江现行）",
+    "daily_slots": "上午 9:00—11:30、下午 14:30—17:00",
+    "max_subjects_per_session": 4,
+    "source_url": "https://www.lzk.hl.cn",
+    "verified_at": "2026-11-02"
+  },
+  "courses": [
+    {
+      "code": "15040",
+      "name": "习近平新时代中国特色社会主义思想概论",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "15043",
+      "name": "中国近现代史纲要",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "15044",
+      "name": "马克思主义基本原理",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "13000",
+      "name": "英语（专升本）",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "00023",
+      "name": "高等数学（工本）",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "02324",
+      "name": "离散数学",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "13013",
+      "name": "高级语言程序设计",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到"
+    },
+    {
+      "code": "13003",
+      "name": "数据结构与算法",
+      "kind": "笔试",
+      "old_code": "02331",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "ref_note": "无公开考试大纲。以下为公开笔记（GitHub chosen1cwp/13003，按 2024 年版统编教材目录组织）的章节标题，仅供参考结构，非官方大纲。",
+      "reference_chapters": {
+        "basis": "personal_note",
+        "source_url": "https://github.com/chosen1cwp/13003",
+        "source_platform": "GitHub · chosen1cwp/13003（个人整理，未经官方审核）",
+        "verified_at": "2026-11-02",
+        "chapters": [
+          "绪论",
+          "线性表",
+          "栈和队列",
+          "数组、广义表和串",
+          "树和二叉树",
+          "图结构",
+          "内部排序",
+          "查找"
+        ]
+      }
+    },
+    {
+      "code": "13015",
+      "name": "计算机系统原理",
+      "kind": "笔试",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "公开考试大纲暂未检索到，且未检索到可验证的按章节组织的公开笔记"
+    },
+    {
+      "code": "13180",
+      "name": "操作系统",
+      "kind": "笔试",
+      "old_code": "02326",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "ref_note": "无公开考试大纲。以下为公开笔记（CSDN《13180操作系统 考点总结》）覆盖的主题，仅供参考结构，非官方大纲。",
+      "reference_chapters": {
+        "basis": "personal_note",
+        "source_url": "https://blog.csdn.net/yhx956058885/article/details/168768971",
+        "source_platform": "CSDN · Jack Yan《13180操作系统 考点总结》（个人整理，未经官方审核）",
+        "verified_at": "2026-11-02",
+        "chapters": [
+          "进程与线程",
+          "进程调度（FCFS、SJF、RR、HRRN 等）",
+          "同步互斥（信号量 / PV 操作 / 经典问题）",
+          "死锁（四个必要条件 / 银行家算法）",
+          "虚拟页式存储（地址转换 / 缺页处理 / LRU 置换）",
+          "文件系统（I 节点计算 / 磁盘调度）"
+        ]
+      }
+    },
+    {
+      "code": "03496",
+      "name": "计算机网络维护技术",
+      "kind": "笔试",
+      "has_syllabus": true,
+      "syllabus_url": "https://zxks.hljea.org.cn/hljzkCMRC/dagang/080901/03496.doc",
+      "syllabus_verified_at": "2026-11-02",
+      "syllabus_note": "章节结构取自官方大纲 .doc 原文（解析于 2026-11-02）。个别章节在大纲原文中未标注章号，按原文标题收录。",
+      "chapters": [
+        "第1章 计算机网络基础知识",
+        "局域网的基础架构",
+        "局域网的安装",
+        "局域网系统的优化与升级",
+        "局域网接入 Internet 的方式",
+        "第6章 局域网共享上网与代理服务器",
+        "第7章 网络的安全与防范",
+        "网络管理与维护及其软件",
+        "第9章 局域网的故障诊断与排除",
+        "第10章 Internet应用中的故障与分析"
+      ]
+    },
+    {
+      "code": "08789",
+      "name": "计算机硬件技术",
+      "kind": "笔试",
+      "has_syllabus": true,
+      "syllabus_url": "https://zxks.hljea.org.cn/hljzkCMRC/dagang/080901/08789.doc",
+      "syllabus_verified_at": "2026-11-02",
+      "syllabus_note": "章节结构取自官方大纲 .doc 原文（解析于 2026-11-02）。",
+      "chapters": [
+        "第1章 微型计算机组成及工作原理",
+        "第2章 微处理器和指令系统",
+        "第3章 汇编语言基础知识",
+        "第4章 主存储器与存储系统",
+        "第5章 指令系统",
+        "第6章 微型机总线",
+        "第7章 常用微机外部设备",
+        "第8章 Internet",
+        "第9章 计算机的组装"
+      ]
+    },
+    {
+      "code": "01347",
+      "name": "计算机系统集成",
+      "kind": "笔试",
+      "has_syllabus": true,
+      "syllabus_url": "https://zxks.hljea.org.cn/hljzkCMRC/dagang/080901/01347.doc",
+      "syllabus_verified_at": "2026-11-02",
+      "syllabus_note": "原课程“计算机系统结构”。章节结构取自官方大纲 .doc 原文（解析于 2026-11-02）；第5章标题在文档解析中缺失，其内容为“重叠与流水方式”，请以大纲原文为准。",
+      "chapters": [
+        "第1章 概论",
+        "第2章 数据表示、寻址方式与指令系统",
+        "第3章 存储、中断、总线与I/O系统",
+        "第4章 存储体系",
+        "第5章（标题解析缺失：重叠与流水方式）",
+        "第6章 向量处理机",
+        "第7章 多处理机",
+        "第8章 数据流计算机和归约机"
+      ]
+    },
+    {
+      "code": "01799",
+      "name": "计算机网络原理及应用",
+      "kind": "笔试",
+      "old_code": "04741",
+      "has_syllabus": true,
+      "syllabus_url": "https://zxks.hljea.org.cn/hljzkCMRC/dagang/080901/01799.doc",
+      "syllabus_verified_at": "2026-11-02",
+      "syllabus_note": "原课程“计算机网络原理”。章节结构取自官方大纲 .doc 原文（解析于 2026-11-02）。",
+      "chapters": [
+        "第1章 计算机网络概述",
+        "第2章 计算机网络体系结构",
+        "第3章 物理层",
+        "第4章 数据链路层",
+        "第5章 网络层",
+        "第6章 传输层",
+        "第7章 应用层",
+        "第8章 局域网技术",
+        "第9章 实用互联网技术"
+      ]
+    },
+    {
+      "code": "10740",
+      "name": "计算机系统导论",
+      "kind": "笔试",
+      "has_syllabus": true,
+      "syllabus_url": "https://zxks.hljea.org.cn/hljzkCMRC/dagang/080901/10740.doc",
+      "syllabus_verified_at": "2026-11-02",
+      "syllabus_note": "章节结构取自官方大纲 .doc 原文（解析于 2026-11-02）；末章在大纲原文中未标注章号，按原文标题收录。",
+      "chapters": [
+        "第1章 计算机系统基本概述",
+        "第2章 计算机运算基础技术",
+        "第3章 计算机系统组成",
+        "第4章 计算机软件操作",
+        "第5章 计算机网络及应用",
+        "第6章 算法与数据结构",
+        "第7章 计算理论、人工智能",
+        "第8章 软件工程基础",
+        "第9章 信息安全与网络安全",
+        "计算机伦理与职业道德（末章，原文未标章号）"
+      ]
+    },
+    {
+      "code": "13014",
+      "name": "高级语言程序设计（实践）",
+      "kind": "实践",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "实践考核课程"
+    },
+    {
+      "code": "13004",
+      "name": "数据结构与算法（实践）",
+      "kind": "实践",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "实践考核课程"
+    },
+    {
+      "code": "11689",
+      "name": "毕业论文",
+      "kind": "论文",
+      "has_syllabus": false,
+      "syllabus_url": null,
+      "reference_chapters": null,
+      "ref_note": "毕业论文"
+    }
+  ],
+  "old_code_map": [
+    {
+      "new_code": "13180",
+      "old_code": "02326",
+      "note": "13180《操作系统》↔ 旧代码 02326。旧代码试卷仅可作为参考来源收录。"
+    },
+    {
+      "new_code": "01799",
+      "old_code": "04741",
+      "note": "01799《计算机网络原理及应用》↔ 旧代码 04741（原《计算机网络原理》）。旧代码试卷仅可作为参考来源收录。"
+    },
+    {
+      "new_code": "13003",
+      "old_code": "02331",
+      "note": "13003《数据结构与算法》↔ 旧代码 02331。旧代码试卷仅可作为参考来源收录。"
+    }
+  ],
+  "papers": [
+    {
+      "id": "zk-paper-13003-2025h1",
+      "track": "zikao",
+      "course_code": "13003",
+      "type": "past_paper",
+      "title": "全国 2025 年 4 月自考《数据结构与算法》真题（13003）",
+      "source_url": "https://www.exam100.net/html/2025/lgl_0611/54986.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "页面为试卷图片版，标题含课程代码与考期；本站不做转写，点来源查看原文。"
+    },
+    {
+      "id": "zk-paper-13015-2025h1",
+      "track": "zikao",
+      "course_code": "13015",
+      "type": "past_paper",
+      "title": "全国 2025 年 4 月自考《计算机系统原理》真题及答案（13015）",
+      "source_url": "https://www.exam100.net/html/2025/lgl_0611/54985.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "页面为试卷图片版，含答案。"
+    },
+    {
+      "id": "zk-paper-13180-2026h1",
+      "track": "zikao",
+      "course_code": "13180",
+      "type": "past_paper",
+      "title": "全国 2026 年 4 月自考《操作系统》真题（13180）",
+      "source_url": "https://www.exam100.net/html/2026/lgl_0509/58939.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "页面为试卷图片版，标题含课程代码与考期。"
+    },
+    {
+      "id": "zk-paper-13013-2011h2",
+      "track": "zikao",
+      "course_code": "13013",
+      "type": "past_paper",
+      "title": "13013 自考《高级语言程序设计》2011 年 10 月真题及答案（PDF）",
+      "source_url": "https://m.book118.com/html/2026/1012/8006067131010133.shtm",
+      "source_platform": "原创力文档 book118（用户上传，2026-10-13 发布于广东）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "PDF 为旧代码时期的全国卷；13013 与旧课程共用卷史，仅作参考来源。"
+    },
+    {
+      "id": "zk-paper-13013-2015h1",
+      "track": "zikao",
+      "course_code": "13013",
+      "type": "past_paper",
+      "title": "13013 自考《高级语言程序设计》2015 年 4 月真题及答案（PDF）",
+      "source_url": "https://max.book118.com/html/2026/1012/7005155155011160.shtm",
+      "source_platform": "原创力文档 book118（用户上传，2026-10-12 发布）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "PDF 为全国卷，含答案与解析。"
+    },
+    {
+      "id": "zk-paper-00023-2017h1",
+      "track": "zikao",
+      "course_code": "00023",
+      "type": "past_paper",
+      "title": "2017 年 4 月高等教育自学考试全国统一命题考试《高等数学（工本）》试卷及答案（00023）",
+      "source_url": "https://img.xuesai.cn/uploadfile/20190725/095dac3c9b8149c88f2b4b3773fe8320.pdf",
+      "source_platform": "学赛网 xuesai（直链 PDF）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "含试题答案及评分参考。"
+    },
+    {
+      "id": "zk-paper-00023-2019h1",
+      "track": "zikao",
+      "course_code": "00023",
+      "type": "past_paper",
+      "title": "2019 年 4 月高等教育自学考试全国统一命题考试《高等数学（工本）》试卷及答案（00023）",
+      "source_url": "https://cdn.yun.sooce.cn/4/50657/pdf/1649058777732258b2080497fb2f1.pdf",
+      "source_platform": "云尺 CDN 直链 PDF",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "含试题答案及评分参考。"
+    },
+    {
+      "id": "zk-paper-00023-2021h2",
+      "track": "zikao",
+      "course_code": "00023",
+      "type": "past_paper",
+      "title": "2021 年 10 月高等教育自学考试全国统一命题考试《高等数学（工本）》（00023）",
+      "source_url": "https://download.zikao365.com/shiti/3559810.pdf",
+      "source_platform": "自考365 zikao365（直链 PDF）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "全国统一命题考试试卷。"
+    },
+    {
+      "id": "zk-paper-13003-2024h2",
+      "track": "zikao",
+      "course_code": "13003",
+      "type": "past_paper",
+      "title": "全国2024年10月自考13003《数据结构与算法》真题",
+      "source_url": "https://www.exam100.net/html/2024/lgl_1212/52910.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "爬虫收录（exam100 理工类栏目），来源页面标题逐字保留。"
+    },
+    {
+      "id": "zk-paper-13013-2026h1",
+      "track": "zikao",
+      "course_code": "13013",
+      "type": "past_paper",
+      "title": "全国2026年4月自考13013《高级语言程序设计》真题",
+      "source_url": "https://www.exam100.net/html/2026/lgl_0509/58930.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "爬虫收录（exam100 理工类栏目），来源页面标题逐字保留。"
+    },
+    {
+      "id": "zk-paper-13013-2025h2",
+      "track": "zikao",
+      "course_code": "13013",
+      "type": "past_paper",
+      "title": "全国2025年10月自考13013《高级语言程序设计》真题",
+      "source_url": "https://www.exam100.net/html/2025/lgl_1203/56783.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "爬虫收录（exam100 理工类栏目），来源页面标题逐字保留。"
+    },
+    {
+      "id": "zk-paper-13013-2024h2",
+      "track": "zikao",
+      "course_code": "13013",
+      "type": "past_paper",
+      "title": "全国2024年10月自考13013《高级语言程序设计》真题及答案",
+      "source_url": "https://www.exam100.net/html/2024/lgl_1202/52653.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "全国卷，含答案；爬虫收录（exam100 理工类栏目）。"
+    },
+    {
+      "id": "zk-paper-13015-2026h1",
+      "track": "zikao",
+      "course_code": "13015",
+      "type": "past_paper",
+      "title": "全国2026年4月自考13015《计算机系统原理》真题",
+      "source_url": "https://www.exam100.net/html/2026/lgl_0509/58931.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "爬虫收录（exam100 理工类栏目），来源页面标题逐字保留。"
+    },
+    {
+      "id": "zk-paper-13180-2025h1",
+      "track": "zikao",
+      "course_code": "13180",
+      "type": "past_paper",
+      "title": "全国2025年4月自考13180《操作系统》真题",
+      "source_url": "https://www.exam100.net/html/2025/lgl_0610/54968.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "爬虫收录（exam100 理工类栏目），来源页面标题逐字保留。"
+    },
+    {
+      "id": "zk-paper-13180-2024h2",
+      "track": "zikao",
+      "course_code": "13180",
+      "type": "past_paper",
+      "title": "全国2024年10月自考13180《操作系统》真题及答案",
+      "source_url": "https://www.exam100.net/html/2024/lgl_1121/57371.html",
+      "source_platform": "百分自考网 exam100（试卷图片版页面）",
+      "source_type": "original",
+      "crawled_at": "2026-11-02",
+      "note": "全国卷，含答案；爬虫收录（exam100 理工类栏目）。"
+    }
+  ],
+  "papers_note": "以上真题均为公开可访问、来源可追溯的原始试卷（页面或 PDF），逐条标注平台与 URL；其中 2026-11-02 爬虫全量收录批次已逐条验证 HTTP 200。计算机类自考真题完整目录（1117 套，含旧代码课程）见历年真题页的爬虫收录目录区。其余考期/课程暂未检索到符合标准的来源，宁缺毋滥。",
+  "notes": [
+    {
+      "id": "zk-note-13003",
+      "track": "zikao",
+      "course_code": "13003",
+      "type": "notes",
+      "title": "《数据结构与算法》学习笔记（按教材章节组织）",
+      "source_url": "https://github.com/chosen1cwp/13003",
+      "source_platform": "GitHub",
+      "source_type": "personal_note",
+      "crawled_at": "2026-11-02",
+      "note": "个人整理，未经官方审核。按“绪论—线性表—栈和队列—数组、广义表和串—树和二叉树—图结构—内部排序—查找”组织。笔记正文保留原始表述，本站不做 AI 润色。"
+    },
+    {
+      "id": "zk-note-13180",
+      "track": "zikao",
+      "course_code": "13180",
+      "type": "notes",
+      "title": "13180操作系统 考点总结",
+      "source_url": "https://blog.csdn.net/yhx956058885/article/details/168768971",
+      "source_platform": "CSDN",
+      "source_type": "personal_note",
+      "crawled_at": "2026-11-02",
+      "note": "个人整理，未经官方审核。按进程与线程、进程调度、同步互斥、死锁、虚拟页式存储、文件系统等主题展开。"
+    },
+    {
+      "id": "zk-note-13015",
+      "track": "zikao",
+      "course_code": "13015",
+      "type": "notes",
+      "title": "13015计算机系统原理 考点总结",
+      "source_url": "https://blog.csdn.net/yhx956058885/article/details/168655901",
+      "source_platform": "CSDN",
+      "source_type": "personal_note",
+      "crawled_at": "2026-11-02",
+      "note": "个人整理，未经官方审核。按第1章计算机系统概述、第2章数据的表示和运算、第5章程序的存储访问、第6章I/O实现等章节组织考点标题。"
+    },
+    {
+      "id": "zk-note-13180-video",
+      "track": "zikao",
+      "course_code": "13180",
+      "type": "notes",
+      "title": "13180《操作系统》B 站公开讲解视频（笔记作者汇总）",
+      "source_url": "https://www.bilibili.com/video/BV1amBeYpEUw/",
+      "source_platform": "bilibili（CSDN 笔记作者汇总的公开课程讲解）",
+      "source_type": "personal_note",
+      "crawled_at": "2026-11-02",
+      "note": "笔记原文中给出的公开视频入口，含 1—4 章讲解与综合题解析；仅作索引收录，非本站内容。"
+    }
+  ],
+  "countdown": {
+    "kaoyan_target": "2027-12-19",
+    "kaoyan_target_note": "预计日期，以教育部公告为准",
+    "zikao_next": null
+  },
+  "meta": {
+    "site_name": "HEU 备考 · 自考计算机 + 28 考研",
+    "built_at": "2026-11-02",
+    "disclaimer": "本站为个人学习规划工具，依据公开可验证来源整理，不构成教学安排。所有内容均标注来源；无法追溯公开 URL 的内容以空状态呈现，不作填充。",
+    "track_rules": [
+      "每个资料条目、时间事件、课表块、题目都绑定且仅绑定一个 track：zikao 或 kaoyan。",
+      "不将 408 大纲章节用作自考 13003 的“官方重点”；不将自考试卷计入 408 真题；自考考期与考研初试不合并为单一倒计时。",
+      "自考旧课程代码（02331/02326/04741）仅作为“参考来源”标注，页面主标识一律使用官方新代码（13003/13180/01799）。"
+    ]
+  }
+}

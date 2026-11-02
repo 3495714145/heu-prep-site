@@ -1,0 +1,272 @@
+{
+  "_readme": "schedule.sample.json —— 一周完整示例（2026-11-02 周一 至 2026-11-08 周日）。排课起始日为 2026-11-03（用户指定），故 11-02 为开课前缓冲日、不生成任何块。演示条件：考研处于基础期（距 2027-12-19 约 13.5 个月）；自考用户已选中 13003 与 13180 两门，下一次考期待官方公布，按基础节奏排课；空白半日为周日下午。每块字段完整，content_title 全部来自已收录大纲/笔记/真题的可追溯标题，并标注 time_range 钟点时段。",
+  "week_start": "2026-11-02",
+  "week_end": "2026-11-08",
+  "context": {
+    "kaoyan_stage": "basic",
+    "kaoyan_stage_basis": "距 2027-12-19（预计，以教育部公告为准）约 13.5 个月，>6 个月判为基础期",
+    "zikao_mode": "far（考期待公布，按基础节奏）",
+    "zikao_selected": [
+      "13003",
+      "13180"
+    ],
+    "blank_half_day": {
+      "day": "sunday",
+      "time_slot": "afternoon"
+    },
+    "note": "2026-11-02 为周一且为排课起始日（11-03）之前的缓冲日，引擎不排块。周日白天不排考研块，周日下午为用户空白半日。"
+  },
+  "blocks": [
+    {
+      "id": "ky-2026-11-03-morning-math2",
+      "date": "2026-11-03",
+      "track": "kaoyan",
+      "subject": "数学二",
+      "content_title": "高等数学：一元微分学 · 中值定理",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 180,
+      "time_slot": "morning",
+      "status": "pending",
+      "time_range": "08:30-11:30"
+    },
+    {
+      "id": "ky-2026-11-03-afternoon-408-ccp",
+      "date": "2026-11-03",
+      "track": "kaoyan",
+      "subject": "408 计算机组成原理",
+      "content_title": "存储器层次结构：主存与 Cache",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 120,
+      "time_slot": "afternoon",
+      "status": "pending",
+      "time_range": "14:30-16:30"
+    },
+    {
+      "id": "ky-2026-11-03-evening-eng2",
+      "date": "2026-11-03",
+      "track": "kaoyan",
+      "subject": "英语二",
+      "content_title": "真题阅读精读 1 篇 + 单词",
+      "source_basis": "past_paper",
+      "source_url": "https://github.com/neville-studio/408-exam-paper",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "pending",
+      "_note": "英二真题以回忆版为主，无来源答案时只做精读、不生成解析。",
+      "time_range": "19:00-20:30"
+    },
+    {
+      "id": "zk-13003-w45-b1",
+      "date": "2026-11-04",
+      "track": "zikao",
+      "subject": "13003 数据结构与算法",
+      "content_title": "树和二叉树",
+      "source_basis": "reference_chapter",
+      "source_url": "https://github.com/chosen1cwp/13003",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "pending",
+      "_note": "13003 无公开考试大纲，章节取自公开笔记（个人整理，未经官方审核），旧代码 02331 仅作参考对照。",
+      "time_range": "19:00-20:30"
+    },
+    {
+      "id": "ky-2026-11-04-morning-408-ds",
+      "date": "2026-11-04",
+      "track": "kaoyan",
+      "subject": "408 数据结构",
+      "content_title": "图：最小生成树（Prim、Kruskal）",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 150,
+      "time_slot": "morning",
+      "status": "pending",
+      "time_range": "08:30-11:00"
+    },
+    {
+      "id": "ky-2026-11-04-afternoon-math2",
+      "date": "2026-11-04",
+      "track": "kaoyan",
+      "subject": "数学二",
+      "content_title": "线性代数：矩阵运算与逆矩阵",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 120,
+      "time_slot": "afternoon",
+      "status": "pending",
+      "time_range": "14:30-16:30"
+    },
+    {
+      "id": "zk-13180-w45-b1",
+      "date": "2026-11-05",
+      "track": "zikao",
+      "subject": "13180 操作系统",
+      "content_title": "同步互斥（信号量 / PV 操作 / 经典问题）",
+      "source_basis": "reference_chapter",
+      "source_url": "https://blog.csdn.net/yhx956058885/article/details/168768971",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "pending",
+      "_note": "13180 无公开考试大纲，主题取自 CSDN 公开笔记（个人整理，未经官方审核），旧代码 02326 仅作参考对照。",
+      "time_range": "19:00-20:30"
+    },
+    {
+      "id": "ky-2026-11-05-morning-408-os",
+      "date": "2026-11-05",
+      "track": "kaoyan",
+      "subject": "408 操作系统",
+      "content_title": "进程与线程：同步与互斥（信号量、PV 操作）",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 150,
+      "time_slot": "morning",
+      "status": "pending",
+      "time_range": "08:30-11:00"
+    },
+    {
+      "id": "ky-2026-11-05-afternoon-math2",
+      "date": "2026-11-05",
+      "track": "kaoyan",
+      "subject": "数学二",
+      "content_title": "高等数学：不定积分与定积分",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 150,
+      "time_slot": "afternoon",
+      "status": "pending",
+      "time_range": "14:30-17:00"
+    },
+    {
+      "id": "zk-13003-w45-b2",
+      "date": "2026-11-06",
+      "track": "zikao",
+      "subject": "13003 数据结构与算法",
+      "content_title": "图结构",
+      "source_basis": "reference_chapter",
+      "source_url": "https://github.com/chosen1cwp/13003",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "pending",
+      "time_range": "19:00-20:30"
+    },
+    {
+      "id": "ky-2026-11-06-morning-408-net",
+      "date": "2026-11-06",
+      "track": "kaoyan",
+      "subject": "408 计算机网络",
+      "content_title": "网络层：IPv4 与子网划分、CIDR",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 120,
+      "time_slot": "morning",
+      "status": "pending",
+      "time_range": "08:30-10:30"
+    },
+    {
+      "id": "ky-2026-11-06-afternoon-408-ds",
+      "date": "2026-11-06",
+      "track": "kaoyan",
+      "subject": "408 数据结构",
+      "content_title": "408 真题（2023）选择题限时练习",
+      "source_basis": "past_paper",
+      "source_url": "https://github.com/neville-studio/408-exam-paper/blob/main/papers-rebuild/2023.pdf",
+      "duration_min": 120,
+      "time_slot": "afternoon",
+      "status": "pending",
+      "time_range": "14:30-16:30"
+    },
+    {
+      "id": "ky-2026-11-06-evening-eng2",
+      "date": "2026-11-06",
+      "track": "kaoyan",
+      "subject": "英语二",
+      "content_title": "完形填空题型训练（真题回忆版）",
+      "source_basis": "past_paper",
+      "source_url": "https://github.com/neville-studio/408-exam-paper",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "skipped",
+      "_note": "status=skipped 演示跳过记录；连续 3 天跳过将触发减负提示，需用户确认后才对下周生效。",
+      "time_range": "19:00-20:30"
+    },
+    {
+      "id": "zk-13180-w45-b2",
+      "date": "2026-11-07",
+      "track": "zikao",
+      "subject": "13180 操作系统",
+      "content_title": "虚拟页式存储（地址转换 / 缺页处理 / LRU 置换）",
+      "source_basis": "reference_chapter",
+      "source_url": "https://blog.csdn.net/yhx956058885/article/details/168768971",
+      "duration_min": 90,
+      "time_slot": "morning",
+      "status": "pending",
+      "time_range": "08:30-10:00"
+    },
+    {
+      "id": "ky-2026-11-07-morning-math2",
+      "date": "2026-11-07",
+      "track": "kaoyan",
+      "subject": "数学二",
+      "content_title": "高等数学：多元函数微分学",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 180,
+      "time_slot": "morning",
+      "status": "pending",
+      "_note": "与 zk-13180-w45-b2 同时段属不同 track：同一时段可并排展示两条轨道，不合并。",
+      "time_range": "08:30-11:30"
+    },
+    {
+      "id": "ky-2026-11-07-afternoon-408-ccp",
+      "date": "2026-11-07",
+      "track": "kaoyan",
+      "subject": "408 计算机组成原理",
+      "content_title": "中央处理器：指令流水线与冒险处理",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 120,
+      "time_slot": "afternoon",
+      "status": "pending",
+      "time_range": "14:30-16:30"
+    },
+    {
+      "id": "ky-2026-11-07-evening-408-ds",
+      "date": "2026-11-07",
+      "track": "kaoyan",
+      "subject": "408 数据结构",
+      "content_title": "查找：B 树与 B+ 树",
+      "source_basis": "syllabus_chapter",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "duration_min": 90,
+      "time_slot": "evening",
+      "status": "done",
+      "_note": "status=done 演示完成记录；完成后可被番茄钟关联计时并计入看板。",
+      "time_range": "19:00-20:30"
+    }
+  ],
+  "empty_slots": [
+    {
+      "date": "2026-11-02",
+      "time_slot": "all",
+      "reason": "排课起始日（2026-11-03）之前，引擎不生成任何块"
+    },
+    {
+      "date": "2026-11-08",
+      "time_slot": "morning",
+      "reason": "周日白天引擎留白休整"
+    },
+    {
+      "date": "2026-11-08",
+      "time_slot": "afternoon",
+      "reason": "用户设定的空白半日（每周至少一个）"
+    },
+    {
+      "date": "2026-11-08",
+      "time_slot": "evening",
+      "reason": "周日晚仅保留可选打卡回顾，引擎不排块"
+    }
+  ],
+  "disclaimer": "课表由本站依据公开大纲/章节结构生成，供学习规划参考，不构成教学安排。",
+  "schedule_start": "2026-11-03"
+}

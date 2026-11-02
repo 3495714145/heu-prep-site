@@ -1,0 +1,130 @@
+{
+  "track": "all",
+  "events": [
+    {
+      "id": "tl-zk-2026h1",
+      "track": "zikao",
+      "event_name": "2026 年上半年高等教育自学考试",
+      "date_start": "2026-04-11",
+      "date_end": "2026-04-12",
+      "date_type": "confirmed",
+      "source_url": "https://www.lzk.hl.cn",
+      "verified_at": "2026-11-02",
+      "note": "黑龙江省招生考试信息港公布。"
+    },
+    {
+      "id": "tl-zk-2026h2",
+      "track": "zikao",
+      "event_name": "2026 年下半年高等教育自学考试",
+      "date_start": "2026-10-24",
+      "date_end": "2026-10-25",
+      "date_type": "confirmed",
+      "source_url": "https://www.lzk.hl.cn",
+      "verified_at": "2026-11-02",
+      "note": "每天上午 9:00—11:30、下午 14:30—17:00；每次最多报 4 门。"
+    },
+    {
+      "id": "tl-zk-2027",
+      "track": "zikao",
+      "event_name": "2027 年及之后自考考期",
+      "date_start": null,
+      "date_end": null,
+      "date_type": "tba",
+      "source_url": "https://www.lzk.hl.cn",
+      "verified_at": "2026-11-02",
+      "note": "尚未公布，待官方公告。本站不写死日期。"
+    },
+    {
+      "id": "tl-ky-dagang",
+      "track": "kaoyan",
+      "event_name": "408 / 数二 / 英二 考试大纲公布（2027 届）",
+      "date_start": "2026-09-01",
+      "date_end": "2026-09-30",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn/kyzx/kydg/",
+      "verified_at": "2026-11-02",
+      "note": "按惯例每年 9 月前后发布，以教育部教育考试院公告为准。"
+    },
+    {
+      "id": "tl-ky-baoming",
+      "track": "kaoyan",
+      "event_name": "预报名 / 正式报名",
+      "date_start": "2026-09-24",
+      "date_end": "2026-10-25",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "预报名约 9 月下旬，正式报名 10 月，以研招网公告为准。"
+    },
+    {
+      "id": "tl-ky-queren",
+      "track": "kaoyan",
+      "event_name": "网上确认",
+      "date_start": "2026-11-01",
+      "date_end": "2026-11-30",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "各省时间不同，以报考点公告为准。"
+    },
+    {
+      "id": "tl-ky-zhunkaozheng",
+      "track": "kaoyan",
+      "event_name": "下载准考证",
+      "date_start": "2026-12-10",
+      "date_end": "2026-12-24",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "考前约两周开放下载。"
+    },
+    {
+      "id": "tl-ky-chushi",
+      "track": "kaoyan",
+      "event_name": "28 考研初试（预计）",
+      "date_start": "2027-12-19",
+      "date_end": "2027-12-20",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "初试预计在 2027 年 12 月 19—20 日（12 月倒数第二个周末），必须以教育部和研招网最终公告为准。参考日程：第一天下午英语（二）14:00—17:00；第二天上午数学（二）8:30—11:30；第二天下午 408 14:00—17:00。"
+    },
+    {
+      "id": "tl-ky-fenshu",
+      "track": "kaoyan",
+      "event_name": "出分 / 国家线",
+      "date_start": "2028-02-01",
+      "date_end": "2028-03-31",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "2 月下旬出分，3 月中旬国家线，以公告为准。"
+    },
+    {
+      "id": "tl-ky-fushi",
+      "track": "kaoyan",
+      "event_name": "复试 / 调剂",
+      "date_start": "2028-03-01",
+      "date_end": "2028-04-30",
+      "date_type": "expected",
+      "source_url": "https://yz.chsi.com.cn",
+      "verified_at": "2026-11-02",
+      "note": "3—4 月各招生单位组织。"
+    }
+  ],
+  "countdown": {
+    "kaoyan_target": "2027-12-19",
+    "kaoyan_target_note": "预计日期，以教育部公告为准",
+    "zikao_next": null
+  },
+  "meta": {
+    "site_name": "HEU 备考 · 自考计算机 + 28 考研",
+    "built_at": "2026-11-02",
+    "disclaimer": "本站为个人学习规划工具，依据公开可验证来源整理，不构成教学安排。所有内容均标注来源；无法追溯公开 URL 的内容以空状态呈现，不作填充。",
+    "track_rules": [
+      "每个资料条目、时间事件、课表块、题目都绑定且仅绑定一个 track：zikao 或 kaoyan。",
+      "不将 408 大纲章节用作自考 13003 的“官方重点”；不将自考试卷计入 408 真题；自考考期与考研初试不合并为单一倒计时。",
+      "自考旧课程代码（02331/02326/04741）仅作为“参考来源”标注，页面主标识一律使用官方新代码（13003/13180/01799）。"
+    ]
+  }
+}
