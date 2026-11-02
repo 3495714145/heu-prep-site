@@ -18,14 +18,14 @@
       evs.forEach(e => {
         const dateText = e.date_start
           ? (e.date_end && e.date_end !== e.date_start ? `${e.date_start} ~ ${e.date_end}` : e.date_start)
-          : "待官方公布（不写死日期）";
+          : "待官方公布";
         const d = h("div", { class: "tl-event" });
         d.innerHTML = `
           <div class="tl-date">${dateText}</div>
           <div class="tl-body">
             <h4>${badge(e.track)} ${e.event_name}${dateTypeBadge(e.date_type)}</h4>
             <div class="note">${e.note || ""}</div>
-            <div class="src" style="margin-top:6px;">来源：<a href="${e.source_url}" target="_blank" rel="noopener">${e.source_url}</a> · verified_at ${e.verified_at}</div>
+            <div class="src" style="margin-top:6px;">来源：<a href="${e.source_url}" target="_blank" rel="noopener">${e.source_url}</a></div>
           </div>`;
         list.appendChild(d);
       });

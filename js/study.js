@@ -201,7 +201,7 @@
         const isSyll = c.has_syllabus && c.chapters;
         const chs = isSyll ? c.chapters : (c.reference_chapters ? c.reference_chapters.chapters : []);
         const url = isSyll ? c.syllabus_url : (c.reference_chapters ? c.reference_chapters.source_url : "");
-        const prefix = isSyll ? "官方大纲章节原文" : "公开笔记章节标题（参考结构，非官方大纲）";
+        const prefix = isSyll ? "官方大纲章节原文" : "公开笔记章节标题";
         chs.forEach((t, i) => {
           const front = `【自考 ${c.code} ${c.name}】官方大纲/笔记中第 ${i + 1} 个章节标题是什么？`;
           const back = `${prefix}：${t}<br>来源：${url}`;

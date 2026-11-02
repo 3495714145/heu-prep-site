@@ -128,10 +128,9 @@ function renderCountdowns() {
       <div class="cd-label">${badge("zikao")} 下一次自考</div>
       ${zk
         ? `<div class="cd-num">${daysUntil(zk.date_start)}<small>天</small></div>
-           <div class="cd-target">${zk.date_start} ~ ${zk.date_end}（已公布）</div>
-           <div class="cd-note" style="color:var(--zikao-ink)">日期类型：confirmed</div>`
+           <div class="cd-target">${zk.date_start} ~ ${zk.date_end}（已公布）</div>`
         : `<div class="cd-num" style="font-size:30px;font-weight:400;line-height:1.4;">待官方公布</div>
-           <div class="cd-target">下一次考期待公布，显示倒计时前需存在已核验 confirmed 日期</div>`}
+           <div class="cd-target">下一次考期待官方公布</div>`}
     </div>
     <div class="countdown-card">
       <div class="cd-label">自定义倒计时</div>

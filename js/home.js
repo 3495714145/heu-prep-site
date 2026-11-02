@@ -15,7 +15,7 @@
         <h3>自考课程总览（18 项）</h3>
         <p class="muted">笔试 15 门 + 实践 2 门 + 毕业论文。课程设置来源：
           <a href="${cs.courses_source.source_url}" target="_blank" rel="noopener">${cs.courses_source.source_platform}</a>
-          （verified_at ${cs.courses_source.verified_at}）</p>
+          </p>
         <p class="muted" style="margin-top:6px;">大纲已收录：<strong>${nSyllabus}</strong> 门（03496 / 08789 / 01347 / 01799 / 10740，官方 .doc 大纲，含考核知识点）
            · 真题：<strong>${cs.papers.length}</strong> 套（<a href="past-papers.html">历年真题合计</a>）
            · 课程笔记：<strong>${Object.keys(window.NOTES_DEEP || {}).filter(k => k !== "meta").length}</strong> 门（<a href="notes.html">课程笔记</a>）
@@ -32,7 +32,7 @@
         d.innerHTML = `
           <div class="cc-head"><span class="cc-code">${c.code}</span><span class="badge code">${c.kind}</span></div>
           <div class="cc-name">${c.name}</div>
-          ${c.old_code ? `<div class="cc-old">旧代码对照：${c.old_code}（仅作参考来源）</div>` : ""}
+          ${c.old_code ? `<div class="cc-old">旧代码对照：${c.old_code}</div>` : ""}
           <div class="cc-status">${statuses}</div>
           <a href="zikao.html#course-${c.code}" style="font-size:13px;">查看章节骨架 →</a>`;
         grid.appendChild(d);

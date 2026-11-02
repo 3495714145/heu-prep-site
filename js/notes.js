@@ -63,9 +63,8 @@
           <div class="nt-meta-item">快照 <strong>${ND.meta.built_at}</strong></div>
           <div class="nt-meta-actions">
             <button class="nt-btn" id="nt-expand">展开全部章节</button>
-          </div>
-        </div>
-        <div class="notice ref"><strong>公开资料整理 + 知识库核对补充，未经官方审核。</strong>网络摘录要点见章末来源链接可逐条溯源；标"含补充"的章节由知识库按标准教材核对扩充。以教材与官方大纲为准。
+          </div>        </div>
+        <div class="notice ref"><strong>公开资料整理 + 知识库核对补充。</strong>每章附来源链接可核对，标"含补充"的章节由知识库按标准教材扩充。以教材与官方大纲为准。
           配套：<a href="past-papers.html">历年真题</a> · <a href="zikao.html#course-${c.code}">自考专区课程卡</a></div>
         <details class="nt-reli"><summary>来源与整理说明（整理者自评）</summary>
           <p>${esc(n.reliability)}</p></details>
@@ -88,11 +87,9 @@
         <div class="nt-meta">
           <div class="nt-meta-item"><strong>${s.chapters.length}</strong> 章</div>
           <div class="nt-meta-item"><strong>${ptTotal}</strong> 条考核知识点</div>
-          <div class="nt-meta-item">解析于 <strong>${c.syllabus_verified_at || SITE_DATA.meta.built_at}</strong></div>
           <div class="nt-meta-actions"><button class="nt-btn" id="nt-expand">展开全部章节</button></div>
         </div>
-        <div class="notice info">该课程以<strong>官方考试大纲逐字解析</strong>作为知识点骨架（"目的要求 / 教学内容 / 考核知识点"取自
-          <a href="${s.syllabus_url || c.syllabus_url}" target="_blank" rel="noopener">官方大纲 .doc 原文</a>，OCR 可能存在个别缺字）。
+        <div class="notice info">本课程知识点取自<a href="${s.syllabus_url || c.syllabus_url}" target="_blank" rel="noopener">官方考试大纲 .doc 原文</a>（目的要求 / 教学内容 / 考核知识点）。
           配套：<a href="past-papers.html">历年真题</a></div>
         <div class="nt-chapters">${s.chapters.map(ch => `
           <details class="nt-chap"><summary>
@@ -115,7 +112,7 @@
       let inner = `<div class="nt-head">
           <span class="cc-code">${c.code}</span>
           <h2>${c.name}</h2>
-          ${c.old_code ? `<span class="nt-old">旧代码 ${c.old_code}（仅作参考来源）</span>` : ""}
+          ${c.old_code ? `<span class="nt-old">旧代码 ${c.old_code}</span>` : ""}
         </div>`;
       if (ND[c.code]) inner += notesDeepHtml(c, ND[c.code]);
       else if (DEEP.syllabus[c.code]) inner += syllabusHtml(c, DEEP.syllabus[c.code]);

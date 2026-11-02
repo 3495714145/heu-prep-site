@@ -40,7 +40,7 @@
           }).join("")}</div>
           <div class="q-ans ${q.answer ? "has-ans" : "no-ans"}" style="display:${rec ? "block" : "none"};">
             ${q.answer
-              ? `正确答案：${q.answer}${rec && rec.correct ? "（回答正确）" : rec ? "（回答错误）" : ""}　答案来自来源仓库参考答案表，本站不生成解析。`
+              ? `正确答案：${q.answer}${rec && rec.correct ? "（回答正确）" : rec ? "（回答错误）" : ""}　答案来自来源参考答案表。`
               : "来源未提供答案"}
           </div>
           <div class="q-actions">

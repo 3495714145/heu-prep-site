@@ -9,7 +9,7 @@
     document.getElementById("ky-408-desc").innerHTML =
       `试卷满分 ${E.full_score} 分，考试时间 ${E.duration_min} 分钟。内容结构：` +
       E.subjects.map(s => `${s.name} ${s.score} 分`).join("、") +
-      `。题型：${E.question_structure}。大纲来源：<a href="${E.syllabus_source.source_url}" target="_blank" rel="noopener">${E.syllabus_source.source_platform}</a>（verified_at ${E.syllabus_source.verified_at}）。`;
+      `。题型：${E.question_structure}。大纲来源：<a href="${E.syllabus_source.source_url}" target="_blank" rel="noopener">${E.syllabus_source.source_platform}</a>。`;
 
     /* 408 四门子科目：大纲章节骨架 */
     const grid = document.getElementById("ky-408-grid");
@@ -35,7 +35,7 @@
         ${K.math2.scope.map(x => `<li>${x}</li>`).join("")}
       </ul>
       <div class="notice info">${K.math2.note}</div>
-      <p class="src">来源：<a href="${K.math2.source_url}" target="_blank" rel="noopener">中国研究生招生信息网 · 考研大纲栏目</a> · verified_at ${K.math2.verified_at}</p>`;
+      <p class="src">来源：<a href="${K.math2.source_url}" target="_blank" rel="noopener">中国研究生招生信息网 · 考研大纲栏目</a></p>`;
 
     /* 英二 */
     document.getElementById("ky-eng2").innerHTML = `
@@ -44,7 +44,7 @@
         ${K.eng2.structure.map(x => `<li>${x}</li>`).join("")}
       </ul>
       <div class="notice info">${K.eng2.note}</div>
-      <p class="src">来源：<a href="${K.eng2.source_url}" target="_blank" rel="noopener">中国研究生招生信息网 · 考研大纲栏目</a> · verified_at ${K.eng2.verified_at}</p>`;
+      <p class="src">来源：<a href="${K.eng2.source_url}" target="_blank" rel="noopener">中国研究生招生信息网 · 考研大纲栏目</a></p>`;
 
     /* 真题 */
     const pp = document.getElementById("ky-papers");

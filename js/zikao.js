@@ -21,7 +21,7 @@
       /* s = DEEP.syllabus[code]：章 → 目的要求 / 教学内容 / 考核知识点（含识记领会层次） */
       const ptTotal = s.chapters.reduce((n, ch) => n + ch.points.length, 0);
       const head = `
-        <div class="notice info">以下"目的要求 / 教学内容 / 考核知识点"逐字取自<a href="${s.syllabus_url || c.syllabus_url}" target="_blank" rel="noopener">官方考试大纲（.doc 原文）</a>，解析于 ${c.syllabus_verified_at || SITE_DATA.meta.built_at}。OCR 识别可能存在个别缺字，以大纲原文为准。${c.syllabus_note || ""}</div>
+        <div class="notice info">以下"目的要求 / 教学内容 / 考核知识点"取自<a href="${s.syllabus_url || c.syllabus_url}" target="_blank" rel="noopener">官方考试大纲（.doc 原文）</a>。${c.syllabus_note || ""}</div>
         <details class="chapters"><summary>展开官方大纲知识点（${s.chapters.length} 章 · 考核知识点 ${ptTotal} 条）</summary>
           <ol class="deep-chapters">`;
       const body = s.chapters.map(ch => {
@@ -44,8 +44,8 @@
       /* n = DEEP.notes[code]：公开笔记的"考点"结构（个人整理，未经官方审核） */
       const ptTotal = n.chapters.reduce((a, ch) => a + ch.points.length, 0);
       return `
-        <div class="notice ref"><strong>可背诵考点（个人笔记，未经官方审核）。</strong>${c.ref_note || ""}<br>
-          来源：<a href="${n.source_url}" target="_blank" rel="noopener">${n.source_platform}</a>（verified_at ${n.verified_at}）。${n.note}</div>
+        <div class="notice ref"><strong>可背诵考点（公开笔记整理）。</strong>${c.ref_note || ""}<br>
+          来源：<a href="${n.source_url}" target="_blank" rel="noopener">${n.source_platform}</a>。${n.note}</div>
         <details class="chapters"><summary>展开笔记考点（${n.chapters.length} 组 · ${ptTotal} 条）</summary>
           <ol class="deep-chapters">${n.chapters.map(ch => `
             <li><strong>${ch.title}</strong>
@@ -75,9 +75,9 @@
         inner += notesHtml(c, n);
       } else if (c.reference_chapters) {
         inner += `
-          <div class="notice ref"><strong>参考结构，非官方大纲。</strong>${c.ref_note}<br>
+          <div class="notice ref"><strong>参考章节结构。</strong>${c.ref_note}<br>
             来源：<a href="${c.reference_chapters.source_url}" target="_blank" rel="noopener">${c.reference_chapters.source_platform}</a>
-            （verified_at ${c.reference_chapters.verified_at}）</div>
+            </div>
           <details class="chapters"><summary>展开参考章节（${c.reference_chapters.chapters.length} 章）</summary>
             <ul class="chapter-list">${c.reference_chapters.chapters.map(t => `<li>${t}</li>`).join("")}</ul>
           </details>`;
@@ -94,7 +94,7 @@
       pp.innerHTML = `<div class="notice empty"><strong>暂无已收录真题。</strong>${Z.papers_note || Z.papers_empty_note || ""}</div>`;
     } else {
       pp.innerHTML = `
-        <div class="notice info">已收录 <strong>${Z.papers.length}</strong> 套来源可追溯的原始真题，逐条标注平台与完整 URL；完整汇总见<a href="past-papers.html">历年真题合计页</a>。</div>
+        <div class="notice info">已收录 <strong>${Z.papers.length}</strong> 套原始真题，附平台与完整来源链接；完整汇总见<a href="past-papers.html">历年真题合计页</a>。</div>
         <div class="grid grid-2">${Z.papers.map(p => `
           <div class="card paper-card">
             <div class="p-title">${p.title}</div>
@@ -110,7 +110,7 @@
       const d = h("div", { class: "card" });
       d.innerHTML = `
         <h3>${n.title} <span class="badge zikao">${n.course_code}</span></h3>
-        <p class="muted">来源平台：${n.source_platform} · 来源类型：${n.source_type === "personal_note" ? "个人笔记（未经官方审核）" : n.source_type} · 收录快照：${n.crawled_at}</p>
+        <p class="muted">来源平台：${n.source_platform} · 来源类型：${n.source_type === "personal_note" ? "个人笔记" : n.source_type} · 收录快照：${n.crawled_at}</p>
         <p style="font-size:13.5px;margin-top:6px;">${n.note}</p>
         <p class="src" style="margin-top:8px;">完整 URL：<a href="${n.source_url}" target="_blank" rel="noopener">${n.source_url}</a></p>`;
       ng.appendChild(d);
@@ -126,8 +126,8 @@
         <li>每日时段：${R.daily_slots}</li>
         <li>每次最多报考：${R.max_subjects_per_session} 门</li>
       </ul>
-      <p class="src">来源：<a href="${R.source_url}" target="_blank" rel="noopener">${R.source_url}</a> · verified_at ${R.verified_at}</p>
+      <p class="src">来源：<a href="${R.source_url}" target="_blank" rel="noopener">${R.source_url}</a></p>
       <hr class="rule">
-      <p style="font-size:13.5px;">2027 年及之后的考期尚未公布，页面显示“待官方公布”，不写死日期。倒计时仅在存在已核验 confirmed 日期时显示（见<a href="index.html">首页</a>与<a href="timeline.html">时间线</a>）。</p>`;
+      <p style="font-size:13.5px;">2027 年及之后的考期尚未公布，页面显示“待官方公告”。倒计时在有正式公布日期后自动显示（见<a href="index.html">首页</a>与<a href="timeline.html">时间线</a>）。</p>`;
   });
 })();

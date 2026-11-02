@@ -68,7 +68,7 @@
       document.getElementById("cat-total").textContent = CAT.courses.reduce((n, c) => n + c.count, 0);
       document.getElementById("cat-courses").textContent = CAT.courses.length;
       document.getElementById("cat-meta").textContent =
-        `${CAT.meta.source_platform} · ${CAT.meta.crawl_scope} · 抓取并逐条验证 ${CAT.meta.crawl_date}（全部 HTTP 200）。仅收录标题与链接，标题逐字取自来源页面；标注“本专业相关”的为 080901 计划内课程（含旧代码卷，仅作参考来源）。`;
+        `${CAT.meta.source_platform} · 抓取于 ${CAT.meta.crawl_date} · 标注“本专业相关”的为 080901 计划内课程（含旧代码卷，仅供参考）。`;
       const box = document.getElementById("paper-catalog");
       /* 本地镜像索引：code|year|month → dir/files */
       const LOC = window.PAPERS_LOCAL || {};
