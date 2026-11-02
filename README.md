@@ -12,7 +12,7 @@
 
 ```
 heu-prep-site/
-├── index.html          首页（三张倒计时卡 + track 切换器）
+├── index.html          首页（三张倒计时卡 + AI 助手 DeepSeek 快速入口 + track 切换器）
 ├── zikao.html          自考专区（18 门课程 + 官方大纲知识点/笔记考点 + 新旧代码对照）
 ├── kaoyan.html         考研专区（408 四门大纲骨架 + 数二/英二范围）
 ├── past-papers.html    历年真题合计（408 分年 2009—2026 + 自考真题 + exam100 爬虫目录 1117 套，计划内课程可离线查看）

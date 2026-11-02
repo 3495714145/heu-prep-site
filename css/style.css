@@ -289,3 +289,10 @@ footer a { color: var(--accent); }
 .m-q .opt.ans-toggle { align-self: flex-start; margin-top: 8px; }
 .m-why { display: none; margin-top: 9px; font-size: 13px; line-height: 1.8; color: var(--ink); background: rgba(0,0,0,0.04); border-radius: 8px; padding: 8px 12px; }
 .m-why.show { display: block; }
+
+/* ---------- 首页 AI 助手（DeepSeek 快速入口） ---------- */
+.ai-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.ai-btn { border: 1px solid var(--rule); background: var(--surface); border-radius: 980px; padding: 8px 18px; font-size: 14px; font-family: var(--font); cursor: pointer; color: var(--ink); transition: border-color .15s ease; }
+.ai-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ai-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 600; }
+.ai-btn.primary:hover { opacity: .88; color: #fff; }

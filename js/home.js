@@ -3,6 +3,25 @@
 "use strict";
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
+    /* AI 助手：DeepSeek 快速入口（官网禁止 iframe 嵌入，只能新标签页打开） */
+    const aiHint = document.getElementById("ai-hint");
+    const DEEPSEEK = "https://chat.deepseek.com/";
+    document.querySelectorAll("[data-ai-open]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        window.open(DEEPSEEK, "_blank", "noopener");
+        if (aiHint) aiHint.textContent = "已在新标签页打开 DeepSeek（首次使用需登录）。";
+      });
+    });
+    document.querySelectorAll("[data-ai-prompt]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const text = btn.dataset.aiPrompt;
+        let clipOk = true;
+        try { await navigator.clipboard.writeText(text); } catch (err) { clipOk = false; /* file:// 下部分浏览器限制剪贴板 */ }
+        window.open(DEEPSEEK, "_blank", "noopener");
+        if (aiHint) aiHint.textContent = (clipOk ? "提问词已复制到剪贴板，" : "本页环境下无法自动复制提问词，请手动输入，") + "DeepSeek 已在新标签页打开" + (clipOk ? " —— 粘贴（Ctrl+V）后发送即可。" : "。");
+      });
+    });
+
     const switcher = document.getElementById("home-track-switch");
     const content = document.getElementById("home-track-content");
     const saved = Store.get("home_track", "zikao");
