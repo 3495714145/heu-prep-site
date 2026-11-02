@@ -3,42 +3,6 @@
 "use strict";
 (function () {
   document.addEventListener("DOMContentLoaded", () => {
-    /* AI 助手：豆包内嵌（官方未强制禁止 iframe）+ DeepSeek 快速入口（禁止 iframe，仅新标签页） */
-    const aiHint = document.getElementById("ai-hint");
-    const AI_URLS = { doubao: "https://www.doubao.com/chat/", deepseek: "https://chat.deepseek.com/" };
-    const embedWrap = document.getElementById("ai-embed");
-    const embedFrame = document.getElementById("ai-embed-frame");
-    const embedToggle = document.getElementById("ai-embed-toggle");
-    let embedLoaded = false;
-    function expandEmbed() {
-      if (!embedLoaded) { embedFrame.src = AI_URLS.doubao; embedLoaded = true; }
-      embedWrap.style.display = "block";
-      embedToggle.textContent = "收起内嵌豆包 ▴";
-      embedToggle.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    function collapseEmbed() {
-      embedWrap.style.display = "none";
-      embedToggle.textContent = "展开内嵌豆包 ▾";
-    }
-    if (embedToggle) embedToggle.addEventListener("click", () => {
-      embedWrap.style.display === "none" ? expandEmbed() : collapseEmbed();
-    });
-    document.querySelectorAll("[data-ai-open]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        window.open(AI_URLS[btn.dataset.aiOpen], "_blank", "noopener");
-        if (aiHint) aiHint.textContent = "已在新标签页打开（首次使用需登录）。";
-      });
-    });
-    document.querySelectorAll("[data-ai-prompt]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const text = btn.dataset.aiPrompt;
-        let clipOk = true;
-        try { await navigator.clipboard.writeText(text); } catch (err) { clipOk = false; /* file:// 下部分浏览器限制剪贴板 */ }
-        expandEmbed();
-        if (aiHint) aiHint.textContent = (clipOk ? "提问词已复制到剪贴板，" : "本页环境下无法自动复制提问词，请手动输入，") + "豆包面板已展开" + (clipOk ? " —— 点进豆包输入框按 Ctrl+V 粘贴后发送即可。" : "。");
-      });
-    });
-
     const switcher = document.getElementById("home-track-switch");
     const content = document.getElementById("home-track-content");
     const saved = Store.get("home_track", "zikao");

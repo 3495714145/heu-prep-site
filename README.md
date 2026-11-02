@@ -12,7 +12,8 @@
 
 ```
 heu-prep-site/
-├── index.html          首页（三张倒计时卡 + AI 助手（内嵌豆包面板 + DeepSeek 快速入口 + 备考提问词）+ track 切换器）
+├── index.html          首页（三张倒计时卡 + track 切换器）
+├── search.html         全站搜索（关键词索引：课程/大纲考点/笔记要点与详解/数学小节/时间线/真题/刷题，多关键词 AND 匹配 + 相关度排序 + 摘要高亮）
 ├── zikao.html          自考专区（18 门课程 + 官方大纲知识点/笔记考点 + 新旧代码对照）
 ├── kaoyan.html         考研专区（408 四门大纲骨架 + 数二/英二范围）
 ├── past-papers.html    历年真题合计（408 分年 2009—2026 + 自考真题 + exam100 爬虫目录 1117 套，计划内课程可离线查看）
@@ -24,7 +25,7 @@ heu-prep-site/
 ├── quiz.html           刷题与错题本（仅显示来源自带答案）
 ├── study.html          番茄钟 + 打卡 + 学习看板（ECharts）+ Anki 导出
 ├── css/style.css       苹果官网风格设计系统
-├── js/                 data.js（权威数据源）+ deep.js（大纲逐章知识点/笔记考点深挖数据）+ notes_deep.js（课程笔记数据，window.NOTES_DEEP）+ papers.js + 各页逻辑 + common.js
+├── js/                 data.js（权威数据源）+ deep.js（大纲逐章知识点/笔记考点深挖数据）+ notes_deep.js（课程笔记数据，window.NOTES_DEEP）+ papers.js + ai_float.js（全站悬浮 AI 助手，内嵌豆包）+ search.js（全站搜索引擎）+ 各页逻辑 + common.js
 ├── data/               zikao.json / kaoyan.json / timeline.json / site.json
 ├── _shared/js/echarts.min.js   本地图表库（零 CDN）
 ├── schedule_engine.md          双引擎课表设计文档

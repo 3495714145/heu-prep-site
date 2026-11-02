@@ -36,7 +36,20 @@ function renderNav() {
   el.innerHTML = `<div class="nav-inner">
     <a class="nav-brand" href="index.html">HEU 备考</a>
     ${NAV_ITEMS.map(n => `<a class="nav-link${n.href === here ? " active" : ""}" href="${n.href}">${n.label}</a>`).join("")}
+    <span class="nav-search">
+      <input id="nav-search-input" type="text" placeholder="搜索课程/章节/知识点…" aria-label="全站搜索">
+      <button id="nav-search-btn" title="搜索" aria-label="搜索">🔍</button>
+    </span>
   </div>`;
+  const si = document.getElementById("nav-search-input");
+  if (si) {
+    const go = () => {
+      const v = si.value.trim();
+      if (v) location.href = "search.html?kw=" + encodeURIComponent(v);
+    };
+    si.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+    document.getElementById("nav-search-btn").addEventListener("click", go);
+  }
 }
 function renderFooter() {
   const el = document.getElementById("site-footer");

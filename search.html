@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全站搜索 · HEU 备考</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="nav"><div id="site-nav"></div></header>
+<main class="section container">
+  <h1 style="font-size:32px;font-weight:700;letter-spacing:-0.02em;">全站搜索</h1>
+  <p class="sub" style="color:var(--muted);margin-top:6px;">覆盖 18 门自考课程、官方大纲逐章考点、11 门课程笔记（含知识点详解）、高中数学 19 章、408 大纲、时间线、真题与刷题。</p>
+  <div style="display:flex;gap:10px;margin:18px 0 10px;flex-wrap:wrap;">
+    <input id="search-page-input" type="text" placeholder="输入关键词，如：散列　导数　tcp　队列　三角函数"
+      style="flex:1;min-width:240px;border:1px solid var(--rule);border-radius:12px;padding:12px 16px;font-size:15px;font-family:var(--font);">
+    <button id="search-page-btn" class="btn" style="border:none;background:var(--ink);color:#fff;border-radius:12px;padding:12px 22px;font-size:15px;cursor:pointer;">搜索</button>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;" id="search-hot"></div>
+  <p class="muted" id="search-info" style="font-size:13.5px;margin:10px 0;"></p>
+  <div id="search-results"></div>
+</main>
+<footer id="site-footer" style="border-top:1px solid var(--rule);padding:20px 0 40px;margin-top:30px;color:var(--muted);font-size:12.5px;"></footer>
+<script src="js/data.js"></script>
+<script src="js/deep.js"></script>
+<script src="js/notes_deep.js"></script>
+<script src="js/math_data_a.js"></script>
+<script src="js/math_data_b.js"></script>
+<script src="js/math_data_c.js"></script>
+<script src="js/math_data_d.js"></script>
+<script src="js/math_data_e.js"></script>
+<script src="js/common.js"></script>
+<script src="js/search.js"></script>
+<script src="js/ai_float.js"></script>
+<script>
+  document.getElementById("search-page-btn").addEventListener("click", () => {
+    const v = document.getElementById("search-page-input").value.trim();
+    if (v) location.href = "search.html?kw=" + encodeURIComponent(v);
+  });
+  (function () {
+    const hot = ["散列", "二叉树", "导数", "三角函数", "TCP", "死锁", "数列", "概率", "真题"];
+    const box = document.getElementById("search-hot");
+    box.innerHTML = hot.map(k => `<a class="badge code" style="cursor:pointer;" href="search.html?kw=${encodeURIComponent(k)}">${k}</a>`).join("");
+  })();
+</script>
+</body>
+</html>

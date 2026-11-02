@@ -290,9 +290,31 @@ footer a { color: var(--accent); }
 .m-why { display: none; margin-top: 9px; font-size: 13px; line-height: 1.8; color: var(--ink); background: rgba(0,0,0,0.04); border-radius: 8px; padding: 8px 12px; }
 .m-why.show { display: block; }
 
-/* ---------- 首页 AI 助手（DeepSeek 快速入口） ---------- */
-.ai-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.ai-btn { border: 1px solid var(--rule); background: var(--surface); border-radius: 980px; padding: 8px 18px; font-size: 14px; font-family: var(--font); cursor: pointer; color: var(--ink); transition: border-color .15s ease; }
-.ai-btn:hover { border-color: var(--accent); color: var(--accent); }
-.ai-btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 600; }
-.ai-btn.primary:hover { opacity: .88; color: #fff; }
+/* ---------- 导航内搜索框 ---------- */
+.nav-search { display: inline-flex; align-items: center; gap: 0; margin-left: 8px; }
+.nav-search input { border: 1px solid var(--rule); border-right: none; border-radius: 980px 0 0 980px; padding: 5px 12px; font-size: 12.5px; font-family: var(--font); width: 150px; background: rgba(0,0,0,0.03); outline: none; }
+.nav-search input:focus { background: #fff; border-color: var(--accent); }
+.nav-search button { border: 1px solid var(--rule); border-left: none; border-radius: 0 980px 980px 0; padding: 4px 9px; font-size: 12px; cursor: pointer; background: rgba(0,0,0,0.03); }
+@media (max-width: 900px) { .nav-search input { width: 110px; } }
+
+/* ---------- 全站悬浮 AI 助手（豆包） ---------- */
+#aif-root { position: fixed; z-index: 9999; font-family: var(--font); }
+#aif-bubble { position: fixed; right: 22px; bottom: 26px; width: 56px; height: 56px; border-radius: 50%; border: none; background: var(--ink); color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,0.22); transition: transform .15s ease; }
+#aif-bubble:hover { transform: scale(1.08); }
+#aif-panel { position: fixed; right: 22px; bottom: 26px; width: 420px; height: 560px; max-height: calc(100vh - 40px); background: var(--surface); border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
+#aif-panel.aif-full { left: 12px !important; top: 12px !important; right: 12px !important; bottom: 12px !important; width: auto; height: auto; }
+#aif-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: var(--ink); color: #fff; cursor: move; user-select: none; flex-shrink: 0; }
+#aif-title { font-size: 13.5px; font-weight: 600; }
+#aif-head-btns { display: flex; align-items: center; gap: 10px; }
+#aif-prompt-toggle { font-size: 12px; cursor: pointer; opacity: .9; }
+#aif-prompt-toggle:hover { opacity: 1; text-decoration: underline; }
+.aif-ib { border: none; background: rgba(255,255,255,0.16); color: #fff; width: 24px; height: 24px; border-radius: 7px; cursor: pointer; font-size: 13px; line-height: 1; }
+.aif-ib:hover { background: rgba(255,255,255,0.3); }
+#aif-prompts { display: none; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-bottom: 1px solid var(--rule); background: var(--bg); }
+#aif-prompts.show { display: flex; }
+.aif-prompt { border: 1px solid var(--rule); background: var(--surface); border-radius: 980px; padding: 5px 13px; font-size: 12.5px; font-family: var(--font); cursor: pointer; color: var(--ink); }
+.aif-prompt:hover { border-color: var(--accent); color: var(--accent); }
+#aif-body { flex: 1; min-height: 0; background: #fff; }
+#aif-body iframe { width: 100%; height: 100%; border: none; }
+#aif-toast { display: none; position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); background: rgba(0,0,0,0.82); color: #fff; font-size: 12.5px; padding: 8px 14px; border-radius: 10px; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; z-index: 10; }
+@media (max-width: 560px) { #aif-panel { width: calc(100vw - 20px); height: calc(100vh - 20px); right: 10px; bottom: 10px; } }
