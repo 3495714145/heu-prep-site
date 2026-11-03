@@ -139,7 +139,13 @@
     };
   }
 
-  /* ---------- 跨设备进度互通：按昵称从云端恢复今日完成状态与照片 ---------- */
+  /* ---------- 跨设备进度互通：按身份从云端恢复今日完成状态与照片 ---------- */
+  /* 身份：多人拓展接口。单人模式（CHECKIN_CONFIG.multiUser=false）统一用 defaultName，页面不显示昵称输入；改 true 即恢复多人昵称模式 */
+  function identity() {
+    const cfg = window.CHECKIN_CONFIG || {};
+    if (!cfg.multiUser) return cfg.defaultName || "Yyy";
+    return Store.get("checkin_name", "").trim() || cfg.defaultName || "Yyy";
+  }
   function applySnapshot(snap, items) {
     const ov = Store.get("block_overrides", {});
     const ph = Store.get("lesson_photos", {});
@@ -157,8 +163,7 @@
     Store.set("lesson_photos", ph);
   }
   async function restoreFromCloud(silent) {
-    const name = Store.get("checkin_name", "").trim();
-    if (!name) { if (!silent) alert("请先在上方填写昵称，再恢复云端进度。"); return false; }
+    const name = identity();
     try {
       const res = await fetchTimeout(`${CLOUD}/${todayTopic()}/json?poll=1&since=12h`);
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -222,7 +227,7 @@
       const res = await fetchTimeout(CLOUD + "/" + topic, {
         method: "POST",
         headers: { "X-Title": "Daily Checkin", "X-Tags": "white_check_mark" },
-        body: JSON.stringify(buildPayload(items, Store.get("checkin_name", "")))
+        body: JSON.stringify(buildPayload(items, identity()))
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
       Store.set("cloud_last_push", new Date().toISOString());
@@ -241,16 +246,16 @@
     const root = document.getElementById("cloud-panel");
     if (!root) return;
     const hasTopic = true; /* 全站共享频道常驻 */
-    const name = Store.get("checkin_name", "");
     const last = Store.get("cloud_last_push", "");
     const auto = Store.get("cloud_auto", true);
+    const cfg = window.CHECKIN_CONFIG || {};
     root.innerHTML = `
       <h3>打卡监视（云端）</h3>
-      <p class="muted">打卡后状态发布到<strong>全站共享频道</strong>（ntfy.sh，SSE 实时推送）；任何人打开<a href="status.html" target="_blank" rel="noopener">监视页</a>即可实时看到所有人的最新打卡（快照保留约 12 小时）。仅上传课程完成状态，不含个人隐私。</p>
+      <p class="muted">打卡后状态发布到<strong>全站共享频道</strong>（ntfy.sh，SSE 实时推送）；任何人打开<a href="status.html" target="_blank" rel="noopener">监视页</a>即可实时看到最新打卡（快照保留约 12 小时）。仅上传课程完成状态，不含个人隐私。</p>
       <div class="cloud-form">
-        <input id="checkin-name" type="text" placeholder="昵称（可选）" value="${name}" maxlength="20">
+        ${cfg.multiUser ? `<input id="checkin-name" type="text" placeholder="昵称" value="${Store.get("checkin_name", "")}" maxlength="20">` : ""}
         <button class="btn" id="checkin-now">立即打卡</button>
-        <button class="btn ghost" id="cloud-restore" title="按昵称拉取云端最新打卡，恢复本机的完成状态与笔记照片">↺ 恢复云端进度</button>
+        <button class="btn ghost" id="cloud-restore" title="拉取云端最新打卡，恢复本机的完成状态与笔记照片">↺ 恢复云端进度</button>
         ${hasTopic ? `<button class="btn ghost" id="cloud-copy">复制监视链接</button>
         <a class="btn ghost" href="status.html" target="_blank" rel="noopener">打开监视页</a>` : ""}
       </div>
@@ -260,12 +265,14 @@
         : "共享频道已就绪"}</div>`;
 
     document.getElementById("checkin-now").addEventListener("click", () => {
-      Store.set("checkin_name", document.getElementById("checkin-name").value.trim());
+      const ni = document.getElementById("checkin-name");
+      if (ni) Store.set("checkin_name", ni.value.trim());
       pushCloud(false);
     });
     document.getElementById("cloud-auto").addEventListener("change", e => Store.set("cloud_auto", e.target.checked));
     document.getElementById("cloud-restore").addEventListener("click", () => {
-      Store.set("checkin_name", document.getElementById("checkin-name").value.trim());
+      const ni = document.getElementById("checkin-name");
+      if (ni) Store.set("checkin_name", ni.value.trim());
       restoreFromCloud(false);
     });
     const copy = document.getElementById("cloud-copy");
