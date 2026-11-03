@@ -399,8 +399,15 @@
     };
   }
 
+  /* ================= 对外 API（study.html 每日计划复用） ================= */
+  window.ScheduleAPI = {
+    generateDay, PERIODS, SLOT_NAMES, SLOT_ORDER, WEEKDAYS,
+    weekIdxOf, mondayOf, SCHEDULE_START, poolLabel, coursePool
+  };
+
   /* ================= 事件 ================= */
   document.addEventListener("DOMContentLoaded", () => {
+    if (!document.getElementById("sch-view")) return; // 非课表页跳过
     document.getElementById("sch-prev").addEventListener("click", () => { const d = new Date(currentDate + "T00:00:00"); d.setDate(d.getDate() - 1); currentDate = fmtDate(d); render(); });
     document.getElementById("sch-next").addEventListener("click", () => { const d = new Date(currentDate + "T00:00:00"); d.setDate(d.getDate() + 1); currentDate = fmtDate(d); render(); });
     document.getElementById("sch-today").addEventListener("click", () => { currentDate = fmtDate(new Date()); render(); });

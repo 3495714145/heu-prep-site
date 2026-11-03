@@ -45,7 +45,7 @@
         sec.innerHTML = `
           <h2 class="mat-gtitle">${g.name} ${head} ${courseLink}</h2>
           <p class="muted">${g.note}</p>
-          <p class="muted mat-origin">仓库目录：<code>${g.origin}</code> · 本组 ${items.length} 份 · ${fmtSize(bytes)}</p>
+          <p class="muted mat-origin">GitHub 来源：<a href="${blobUrl(g.origin)}" target="_blank" rel="noopener">${MATERIALS_SOURCE.repo} / ${g.origin}</a> · 仓库目录 <code>${g.origin}</code> · 本组 ${items.length} 份 · ${fmtSize(bytes)}</p>
           <div class="grid grid-2">${items.map(it => {
             const ext = it.name.split(".").pop().toLowerCase();
             const t = EXT_MAP[ext] || { label: ext.toUpperCase(), icon: "📦" };

@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的学习 · HEU 备考</title>
+<title>我的学习 · Yyy</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -12,11 +12,14 @@
 <main>
   <section class="hero container">
     <h1>我的学习</h1>
-    <p class="sub">番茄钟、学习数据看板、Anki 卡片导出、每日打卡。全部数据存于本地浏览器，不依赖第三方服务。</p>
+    <p class="sub">今日学习计划、番茄钟、学习数据看板、Anki 卡片导出、打卡与云端监视。课表与统计存于本地浏览器；打卡监视为自愿开启的公开同步。</p>
   </section>
 
   <section class="section container">
-    <div class="grid grid-2">
+    <h2>今日学习计划 <button class="btn small ghost" id="plan-refresh" style="vertical-align:middle;">刷新</button></h2>
+    <p class="desc">按<a href="schedule.html">课表</a>当日节次排序，每节课 = 一个章节小节进度单元：「今天要完成：XX课XX章XX知识点」。完成状态与课表页互通。</p>
+    <div id="today-plan-root"><div class="notice info">正在生成今日计划…</div></div>
+    <div class="grid grid-2" style="margin-top:18px;">
       <div class="card" id="pomo-card">
         <h3>番茄钟</h3>
         <p class="muted">25 分钟专注 + 5 分钟休息（可调）。启动时须关联一个课表块或一个科目；完成后时长自动累加到该 track/科目统计，并回写课表块状态。</p>
@@ -32,6 +35,7 @@
           <input type="number" id="pomo-len" min="5" max="120" step="5" value="25">
         </div>
       </div>
+      <div class="card" id="cloud-panel"></div>
       <div class="card">
         <h3>每日打卡</h3>
         <p class="muted">打卡与课表解耦：课表是推荐安排，打卡是实际执行，并列展示。</p>
@@ -80,8 +84,10 @@
 <footer id="site-footer"></footer>
 <script src="js/data.js"></script>
 <script src="js/common.js"></script>
+<script src="js/schedule.js"></script>
 <script src="_shared/js/echarts.min.js"></script>
 <script src="js/study.js"></script>
+<script src="js/plan.js"></script>
   <script src="js/ai_float.js"></script>
 </body>
 </html>

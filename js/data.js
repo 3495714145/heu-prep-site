@@ -10,7 +10,7 @@
  */
 const SITE_DATA = {
   meta: {
-    site_name: "HEU 备考 · 自考计算机 + 28 考研",
+    site_name: "Yyy · 自考计算机 + 28 考研",
     built_at: "2026-11-02",
     disclaimer: "本站为个人学习备考规划工具，内容整理自公开资料，不构成教学安排。"
   },

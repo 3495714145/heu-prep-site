@@ -334,3 +334,23 @@ footer a { color: var(--accent); }
 .mat-name { font-size: 14px; font-weight: 600; margin: 9px 0 11px; word-break: break-all; line-height: 1.5; }
 .mat-actions { display: flex; gap: 8px; }
 @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* ---- 今日学习计划 / 打卡监视 ---- */
+.plan-summary { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 10px 0 8px; }
+.plan-date { font-size: 15px; font-weight: 600; }
+.plan-pct { font-size: 26px; font-weight: 700; color: var(--accent); }
+.plan-pct small { font-size: 13px; font-weight: 400; color: var(--muted); }
+.prog { height: 8px; background: rgba(0,0,0,0.07); border-radius: 980px; overflow: hidden; margin: 8px 0; }
+.prog.big { height: 12px; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, #30d158, #34c759); border-radius: 980px; transition: width .4s ease; }
+.plan-lesson { background: var(--card-bg, #fff); border: 1px solid var(--rule); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+.plan-lesson.done { opacity: .82; }
+.pl-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pl-time { flex: 0 0 96px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+.pl-goal { flex: 1 1 260px; }
+.pl-goal-label { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.pl-goal-text { font-size: 14.5px; font-weight: 600; line-height: 1.55; }
+.pl-actions { display: flex; gap: 8px; margin-top: 6px; }
+.cloud-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.cloud-form input[type="text"] { flex: 1 1 140px; border: 1px solid var(--rule); border-radius: 980px; padding: 8px 14px; font-size: 14px; outline: none; }
+.cloud-form input[type="text"]:focus { border-color: var(--accent); }
