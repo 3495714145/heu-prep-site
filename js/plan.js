@@ -453,19 +453,20 @@
         : (f.onTrack
           ? `预计 <strong>${f.finishDate}</strong> 学完，进度正常`
           : `<strong class="cursor-warn">按当前速度考前约完成 ${f.percentByExam}%，建议加快或校准</strong>`);
-      return `<div class="cursor-row${code === main ? " is-main" : ""}">
-        <div class="cursor-name">${CursorAPI.poolLabel(code)}${code === main ? `<span class="badge ok">主线</span>` : ""}</div>
+      const finished = cur >= units.length;
+      return `<div class="cursor-row${code === main ? " is-main" : ""}${finished ? " is-done" : ""}">
+        <div class="cursor-name">${CursorAPI.poolLabel(code)}${code === main ? `<span class="badge ok">主线</span>` : ""}${finished ? `<span class="badge ok">已完成</span>` : ""}</div>
         <div class="cursor-mid">
-          <div class="prog"><div class="prog-fill" style="width:${pct}%"></div></div>
-          <div class="cursor-meta">当前位置：${pos}（${cur}/${units.length}）· ${paceHtml}
+          <div class="prog"><div class="prog-fill" style="width:${pct}%;${finished ? "background:var(--ok,#2fb344);" : ""}"></div></div>
+          <div class="cursor-meta">${finished ? `<strong style="color:var(--ok,#2fb344);">100% 全部学完</strong> · 考前自由复盘` : `当前位置：${pos}（${cur}/${units.length}）· ${paceHtml}`}
             ${exam ? ` · 考期 <strong>${exam.date}</strong>${exam.confirmed ? "" : "（按惯例推算）"}` : ""}</div>
         </div>
         <div class="cursor-ops">
           ${code === main ? "" : `<button class="btn small ghost" data-main="${code}">设为主线</button>`}
-          <select class="cursor-cal" data-cal="${code}">
+          ${finished ? "" : `<select class="cursor-cal" data-cal="${code}">
             <option value="">校准游标…</option>
             ${units.map(u => `<option value="${u.idx}">${u.idx === cur ? "▶ " : ""}${u.idx + 1}. ${u.title}</option>`).join("")}
-          </select>
+          </select>`}
         </div>
       </div>`;
     }).join("");

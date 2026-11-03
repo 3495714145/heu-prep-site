@@ -225,18 +225,6 @@
       _role: role, status: "pending"
     };
   }
-  function reviewBlock(code, role, dateISO) {
-    const isKaoyan = ["数二", "英二", "408"].includes(code);
-    const label = poolLabel(code);
-    return {
-      id: `rv-${code}-${dateISO || fmtDate(new Date())}`, /* rv 前缀：复盘块不计入游标 */
-      date: dateISO || fmtDate(new Date()), track: isKaoyan ? "kaoyan" : "zikao", subject: code,
-      content_title: `${label}：全部单元已学完，进入错题回顾与真题巩固（复盘）`,
-      source_basis: "past_paper", source_url: "",
-      duration_min: role === "main" ? 90 : 45, time_slot: role === "main" ? "morning" : "afternoon",
-      _role: role, status: "pending"
-    };
-  }
   function poolLabel(code) {
     if (code === "数二") return "数学（二）";
     if (code === "英二") return "英语（二）";
@@ -255,16 +243,15 @@
     const pushCourse = (code, role, n) => {
       const units = unitsOf(code);
       const cur = cursorOf(code);
+      const remaining = units.length - cur;
+      if (remaining <= 0) return; /* 已完成的课不再出新卡片，完成状态在进度条上以 100% 绿色标明 */
       const blocks = [];
-      for (let i = 0; i < n; i++) {
-        const u = units[cur + i];
-        blocks.push(u ? unitBlock(u, role, dateISO) : reviewBlock(code, role, dateISO));
-      }
+      for (let i = 0; i < Math.min(n, remaining); i++) blocks.push(unitBlock(units[cur + i], role, dateISO));
       const f = forecast(code);
       groups.push({ code, blocks, key: f.percentByExam === null ? 101 : f.percentByExam });
     };
     const mq = quotaFor(plan.main, true, offsetDays || 0);
-    pushCourse(plan.main, "main", mq > 0 ? mq : 1); /* 主线学完也保留每天 1 个复盘块，与支线学完出复盘保持一致 */
+    if (mq > 0) pushCourse(plan.main, "main", mq);
     plan.sides.forEach(s => pushCourse(s.code, "side", 1));
     groups.sort((a, b) => a.key - b.key || (a.code === plan.main ? -1 : b.code === plan.main ? 1 : 0));
     const out = [];
