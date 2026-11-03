@@ -465,8 +465,7 @@
         <div class="cursor-name">${CursorAPI.poolLabel(code)}${code === main ? `<span class="badge ok">主线</span>` : ""}${finished ? `<span class="badge ok">已完成</span>` : ""}</div>
         <div class="cursor-mid">
           <div class="prog"><div class="prog-fill" style="width:${pct}%;${finished ? "background:var(--ok,#2fb344);" : ""}"></div></div>
-          <div class="cursor-meta">${finished ? `<strong style="color:var(--ok,#2fb344);">100% 全部学完</strong> · 考前自由复盘` : `当前位置：${pos}（${cur}/${units.length}）· ${paceHtml}`}
-            ${exam ? ` · 考期 <strong>${exam.date}</strong>${exam.confirmed ? "" : "（按惯例推算）"}` : ""}</div>
+          <div class="cursor-meta">${finished ? `<strong style="color:var(--ok,#2fb344);">100% 全部学完</strong>` : `当前：${pos}（${cur}/${units.length}）`}</div>
         </div>
         <div class="cursor-ops">
           ${code === main ? "" : `<button class="btn small ghost" data-main="${code}">设为主线</button>`}
