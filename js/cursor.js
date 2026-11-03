@@ -62,6 +62,12 @@
     const m = cursorMap();
     m[code] = Math.max(0, Math.min(doneCount, unitsTotal(code)));
     Store.set("course_cursor", m);
+    /* 推进历史：每天每课记录一次最终位置（看板游标折线数据源） */
+    const h = Store.get("cursor_history", {});
+    const t = fmtDate(new Date());
+    h[t] = h[t] || {};
+    h[t][code] = m[code];
+    Store.set("cursor_history", h);
     /* 校准游标时清掉该课旧单元的完成/跳过覆盖，避免历史状态误标 */
     const ov = Store.get("block_overrides", {});
     const re = new RegExp("^u-" + code.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "-\\d+$");
@@ -82,6 +88,31 @@
   function parseUnitId(id) {
     const m = /^u-(.+)-(\d+)$/.exec(id);
     return m ? { code: m[1], idx: +m[2] } : null;
+  }
+
+  /* ---------- 游标状态跨设备同步 ---------- */
+  function cursorState() {
+    return { course_cursor: cursorMap(), main_course: Store.get("main_course", ""), skipped_units: skippedMap() };
+  }
+  /* 采用云端游标：只进不退（云端进度更多才采纳），返回是否发生变化 */
+  function applyCursorState(st) {
+    if (!st || !st.course_cursor) return false;
+    let changed = false;
+    const m = cursorMap();
+    Object.entries(st.course_cursor).forEach(([code, v]) => {
+      const total = unitsTotal(code);
+      const c = Math.max(0, Math.min(+v || 0, total));
+      if (total > 0 && c > (m[code] || 0)) { m[code] = c; changed = true; }
+    });
+    if (changed) {
+      Store.set("course_cursor", m);
+      const h = Store.get("cursor_history", {});
+      const t = fmtDate(new Date());
+      h[t] = h[t] || {};
+      Object.entries(m).forEach(([code, v]) => { h[t][code] = v; });
+      Store.set("cursor_history", h);
+    }
+    return changed;
   }
 
   /* ---------- 主线课 ---------- */
@@ -142,12 +173,12 @@
   }
 
   /* ---------- 每日任务量（自动倒排） ---------- */
-  function quotaFor(code, isMain) {
+  function quotaFor(code, isMain, offsetDays) {
     const total = unitsTotal(code);
     const done = cursorOf(code);
     const remaining = total - done;
     if (remaining <= 0) return 0;
-    const daysLeft = daysUntilExam(code) || 30;
+    const daysLeft = Math.max(1, (daysUntilExam(code) || 30) - (offsetDays || 0));
     return Math.max(1, Math.min(3, Math.ceil(remaining / daysLeft)));
   }
   function todayQuota() {
@@ -182,24 +213,24 @@
   }
 
   /* ---------- 今日任务块（与旧课表块同构，兼容快照协议与打卡统计） ---------- */
-  function unitBlock(u, role) {
+  function unitBlock(u, role, dateISO) {
     const dur = role === "main" ? 90 : 45;
     const title = u.title; /* 408 已含「子科：章节」；其余课名由展示层用 poolLabel 拼接 */
     return {
       id: `u-${u.code}-${u.idx}`,
-      date: fmtDate(new Date()), track: u.track, subject: u.code,
+      date: dateISO || fmtDate(new Date()), track: u.track, subject: u.code,
       content_title: `${title}${role === "main" ? "（主线）" : "（支线）"}`,
       source_basis: u.source_basis, source_url: u.source_url,
       duration_min: dur, time_slot: role === "main" ? "morning" : "afternoon",
       _role: role, status: "pending"
     };
   }
-  function reviewBlock(code, role) {
+  function reviewBlock(code, role, dateISO) {
     const isKaoyan = ["数二", "英二", "408"].includes(code);
     const label = poolLabel(code);
     return {
-      id: `rv-${code}-${fmtDate(new Date())}`, /* rv 前缀：复盘块不计入游标 */
-      date: fmtDate(new Date()), track: isKaoyan ? "kaoyan" : "zikao", subject: code,
+      id: `rv-${code}-${dateISO || fmtDate(new Date())}`, /* rv 前缀：复盘块不计入游标 */
+      date: dateISO || fmtDate(new Date()), track: isKaoyan ? "kaoyan" : "zikao", subject: code,
       content_title: `${label}：全部单元已学完，进入错题回顾与真题巩固（复盘）`,
       source_basis: "past_paper", source_url: "",
       duration_min: role === "main" ? 90 : 45, time_slot: role === "main" ? "morning" : "afternoon",
@@ -215,9 +246,11 @@
   }
   /* 今日全部游标任务块：主线 N 个 + 各支线 1 个；
      排序为紧迫度优先：考前完成率低的课排最前（最危险先学），并列时主线课优先 */
-  function todayUnitBlocks() {
+  /* 某天的游标任务块（offset=0 即今天；预排只读不落库，完成状态仍以实际打卡为准） */
+  function unitBlocksFor(offsetDays) {
     const plan = todayQuota();
     if (!plan.main) return [];
+    const dateISO = fmtDate(new Date(new Date().getTime() + (offsetDays || 0) * 86400000));
     const groups = [];
     const pushCourse = (code, role, n) => {
       const units = unitsOf(code);
@@ -225,22 +258,24 @@
       const blocks = [];
       for (let i = 0; i < n; i++) {
         const u = units[cur + i];
-        blocks.push(u ? unitBlock(u, role) : reviewBlock(code, role));
+        blocks.push(u ? unitBlock(u, role, dateISO) : reviewBlock(code, role, dateISO));
       }
       const f = forecast(code);
       groups.push({ code, blocks, key: f.percentByExam === null ? 101 : f.percentByExam });
     };
-    pushCourse(plan.main, "main", plan.mainQuota);
-    plan.sides.forEach(s => pushCourse(s.code, "side", s.quota));
+    pushCourse(plan.main, "main", quotaFor(plan.main, true, offsetDays || 0));
+    plan.sides.forEach(s => pushCourse(s.code, "side", 1));
     groups.sort((a, b) => a.key - b.key || (a.code === plan.main ? -1 : b.code === plan.main ? 1 : 0));
     const out = [];
     groups.forEach(g => out.push(...g.blocks));
     return out;
   }
+  function todayUnitBlocks() { return unitBlocksFor(0); }
 
   window.CursorAPI = {
     unitsOf, unitsTotal, cursorOf, setCursor, markUnitDone, skipUnit,
     isUnitId, parseUnitId, coursePool, mainCourse, setMainCourse,
-    examDateOf, daysUntilExam, todayQuota, forecast, todayUnitBlocks, poolLabel
+    examDateOf, daysUntilExam, todayQuota, forecast, todayUnitBlocks, poolLabel,
+    unitBlocksFor, cursorState, applyCursorState
   };
 })();

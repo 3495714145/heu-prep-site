@@ -403,3 +403,9 @@ footer a { color: var(--accent); }
 /* 今日已完成归档：折叠置底 */
 .plan-lesson.folded { opacity: .55; }
 .plan-lesson.folded .pl-goal-label { color: var(--muted); }
+/* 未来 3 天预排 */
+.pv-box { margin-top: 12px; border: 1px dashed var(--rule); border-radius: 10px; padding: 8px 12px; }
+.pv-box summary { cursor: pointer; font-size: 13px; font-weight: 600; }
+.pv-box .pv-row { font-size: 13px; margin-top: 6px; line-height: 1.6; }
+/* 监视页各课小计 */
+.course-sum { margin: 10px 0 12px; display: flex; flex-wrap: wrap; gap: 6px; }

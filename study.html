@@ -38,7 +38,7 @@
       <div class="card" id="cloud-panel"></div>
       <div class="card">
         <h3>每日打卡</h3>
-        <p class="muted">打卡与课表解耦：课表是推荐安排，打卡是实际执行，并列展示。</p>
+        <p class="muted">打卡与计划解耦：计划是游标顺延的推荐任务，打卡是实际执行，并列展示。</p>
         <div id="goal-list" style="margin-top:10px;"></div>
         <hr class="rule">
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
@@ -94,6 +94,7 @@
     <div class="grid grid-2">
       <div class="chart-box"><h3>本周各科目学习时长（分钟，按 track 区分）</h3><div id="chart-week" style="height:280px;"></div></div>
       <div class="chart-box"><h3>近 14 天番茄钟完成数</h3><div id="chart-pomo" style="height:280px;"></div></div>
+      <div class="chart-box"><h3>各课游标推进（近 14 天已完成单元数）</h3><div id="chart-cursor" style="height:300px;"></div></div>
     </div>
     <div class="notice empty" style="margin-top:14px;">资料收录状态只显示可验证信息（大纲已收录/暂缺、真题 N 套等），不显示无法验证的“覆盖率百分比”。</div>
   </section>
@@ -117,12 +118,11 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="js/data.js"></script>
-<script src="js/common.js?v=20261107"></script>
-<script src="js/cursor.js?v=20261107"></script>
-<script src="js/schedule.js?v=20261107"></script>
+<script src="js/common.js?v=20261111"></script>
+<script src="js/cursor.js?v=20261111"></script>
 <script src="_shared/js/echarts.min.js"></script>
-<script src="js/study.js?v=20261108"></script>
-<script src="js/plan.js?v=20261110"></script>
+<script src="js/study.js?v=20261111"></script>
+<script src="js/plan.js?v=20261111"></script>
   <script src="js/ai_float.js"></script>
 </body>
 </html>

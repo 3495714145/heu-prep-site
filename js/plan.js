@@ -145,6 +145,13 @@
     return j.attachment.url;
   }
 
+  function courseLabelOf(blk) {
+    if (!blk) return "";
+    if (CursorAPI.isUnitId(blk.id)) return CursorAPI.poolLabel(CursorAPI.parseUnitId(blk.id).code);
+    if (String(blk.id).startsWith("rv-")) return CursorAPI.poolLabel(blk.subject);
+    return blk.subject || "";
+  }
+
   function buildPayload(items, name) {
     const lessons = items.map(v => {
       const st = blockStatus(v.block);
@@ -154,6 +161,7 @@
         time: v.time,
         label: v.label,
         track: v.block.track,
+        course: courseLabelOf(v.block),
         custom: v.custom,
         status: st,
         done_at: st === "done" ? doneAtOf(v.block) : "",
@@ -168,6 +176,7 @@
       date: todayISO(),
       updated_at: new Date().toLocaleString("zh-CN", { hour12: false }),
       summary: { total: lessons.length, done, skipped, pending: lessons.length - done - skipped, percent: lessons.length ? Math.round(done / lessons.length * 100) : 0 },
+      cursors: CursorAPI.cursorState(),
       lessons
     };
   }
@@ -214,8 +223,7 @@
       const res = await fetchTimeout(`${CLOUD}/${todayTopic()}/json?poll=1&since=12h`);
       if (!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
-      const items = todayItems();
-      let found = false;
+      const snaps = [];
       text.trim().split(/\n/).forEach(line => {
         try {
           const m = JSON.parse(line);
@@ -223,10 +231,21 @@
           const snap = JSON.parse(m.message);
           if (!snap || snap.app !== "yyy-prep-checkin" || (snap.name || "匿名学习者") !== name) return;
           if (snap.date !== todayISO()) return; /* 只恢复今天的快照 */
-          applySnapshot(snap, items); found = true; /* poll 按时间正序，后一条覆盖，最终为该昵称最新状态 */
+          snaps.push(snap); /* poll 按时间正序，后一条覆盖，最终为该昵称最新状态 */
         } catch (e) { /* 跳过坏行 */ }
       });
-      if (found) { renderPlan(); if (!silent) alert(`已从云端恢复「${name}」的今日进度。`); return true; }
+      if (snaps.length) {
+        /* 先采纳云端游标（只进不退），再按最终窗口套用完成状态 */
+        let cursorChanged = false;
+        snaps.forEach(s => { if (s.cursors) cursorChanged = CursorAPI.applyCursorState(s.cursors) || cursorChanged; });
+        const items = todayItems();
+        snaps.forEach(s => applySnapshot(s, items));
+        renderPlan();
+        if (!silent) alert(cursorChanged
+          ? `已从云端恢复「${name}」的今日进度，并同步了各课学习游标。`
+          : `已从云端恢复「${name}」的今日进度。`);
+        return true;
+      }
       if (!silent) alert("云端 12 小时内没有该昵称的今日打卡记录。");
       return false;
     } catch (e) {
@@ -450,10 +469,24 @@
         </div>
       </div>`;
     }).join("");
+    /* 未来 3 天预排：按当前游标确定性预估（只读不落库，今日完成后自动顺延） */
+    const WD = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+    const prevRows = [1, 2, 3].map(off => {
+      const d = new Date(); d.setDate(d.getDate() + off);
+      const blocks = CursorAPI.unitBlocksFor(off);
+      if (!blocks.length) return "";
+      const byCourse = {};
+      blocks.forEach(b => {
+        const c = CursorAPI.isUnitId(b.id) ? CursorAPI.poolLabel(CursorAPI.parseUnitId(b.id).code) : CursorAPI.poolLabel(b.subject);
+        byCourse[c] = (byCourse[c] || 0) + 1;
+      });
+      return `<div class="pv-row"><strong>${fmtDate(d)}（${WD[d.getDay()]}）</strong>：${Object.entries(byCourse).map(([c, n]) => `${c} × ${n}`).join(" · ")}</div>`;
+    }).filter(Boolean).join("");
     return `<div class="cursor-panel">
       <h3>学习进度游标</h3>
       <p class="muted">今日任务由各课游标顺延生成，主线课任务量按「剩余单元 ÷ 距考天数」每天自动倒排；每完成一课须提交该章节笔记照片，上传成功才自动前进（监视端同步可见），跳过则记入跳过。你学到哪里由你校准，网页只负责把计划排顺。</p>
       ${rows}
+      ${prevRows ? `<details class="pv-box"><summary>未来 3 天预排（按当前游标预估）</summary>${prevRows}</details>` : ""}
     </div>`;
   }
   function bindCursorControls(root) {
@@ -501,6 +534,7 @@
       root.innerHTML = head + `<div class="notice empty"><strong>今天没有游标任务与自定义安排。</strong>可在上方「学习进度游标」里校准每门课学到哪了（或在本页下方「学习进度线」选择课程合集），也可点「＋ 自定义安排」添加今日任务。</div>`;
       bindCustomButtons(root);
       bindCursorControls(root);
+      document.dispatchEvent(new CustomEvent("heuprep:plan-changed"));
       return;
     }
 
@@ -544,7 +578,18 @@
         if (act === "done" && CursorAPI.isUnitId(id)) { alert("游标任务必须提交章节笔记照片才能完成：点「📷 笔记打卡」上传后自动完成并推进进度。"); return; }
         if (act === "done") setStatus(blk, "done");
         else if (act === "skip") setStatus(blk, "skipped", prompt("跳过原因（可选）：") || "");
-        else setStatus(blk, "pending");
+        else {
+          /* 撤销完成/跳过：联动撤回笔记照片 + 回退游标 + 清跳过记录 */
+          if (photoOf(id) && !confirm("撤销将同时撤回该任务的笔记照片（监视端同步消失），继续？")) return;
+          if (photoOf(id)) recallPhoto(id);
+          if (CursorAPI.isUnitId(id)) {
+            const pu = CursorAPI.parseUnitId(id);
+            const sk = Store.get("skipped_units", {});
+            if (sk[pu.code]) { sk[pu.code] = sk[pu.code].filter(i => i !== pu.idx); Store.set("skipped_units", sk); }
+            if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
+          }
+          setStatus(blk, "pending");
+        }
         /* 打卡归档：完成/跳过记入今日日志（监视页全天可见）；撤销则移出归档 */
         if (act === "done" || act === "skip") {
           const v = items.find(x => x.block.id === id);
@@ -555,7 +600,7 @@
           const pu = CursorAPI.parseUnitId(id);
           if (act === "done") CursorAPI.markUnitDone(pu.code, pu.idx);
           else if (act === "skip") CursorAPI.skipUnit(pu.code, pu.idx);
-          else if (act === "reset" && CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
+          /* reset 的游标回退与跳过清理已在上方联动处理 */
         }
         renderPlan();
         if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
@@ -620,6 +665,7 @@
         }
       });
     });
+    document.dispatchEvent(new CustomEvent("heuprep:plan-changed"));
   }
 
   function bindCustomButtons(root) {

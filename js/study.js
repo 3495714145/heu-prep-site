@@ -26,7 +26,13 @@
   }
   function renderPomoTargets() {
     const sel = document.getElementById("pomo-target");
-    sel.innerHTML = pomoTargets().map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+    const prev = sel.value;
+    const opts = pomoTargets();
+    sel.innerHTML = opts.map(o => `<option value="${o.value}">${o.label}</option>`).join("");
+    /* 默认选中第一个未完成的今日游标任务（游标前进后自动跟上）；否则保持原选择 */
+    const ov = Store.get("block_overrides", {});
+    const pending = opts.find(o => o.value.startsWith("unit:") && (!ov[o.value.slice(5)] || ov[o.value.slice(5)].status === "pending"));
+    sel.value = pending ? pending.value : (opts.some(o => o.value === prev) ? prev : (opts[0] ? opts[0].value : ""));
   }
   function pomoTick() {
     pomoState.left--;
@@ -51,6 +57,7 @@
     Store.set("pomodoro_log", rec);
     /* 打卡进度自动累加 */
     bumpGoal("pomodoro", 1);
+    renderPomoTargets(); /* 游标任务状态可能变化，刷新下拉并选中下一个未完成任务 */
     alert(target.startsWith("unit:")
       ? `番茄钟完成（${len} 分钟），已计入学习统计。\n注意：游标任务需提交章节笔记照片才会完成并推进进度，请回到今日计划点「📷 笔记打卡」。`
       : `番茄钟完成（${len} 分钟），已计入学习统计。`);
@@ -172,6 +179,34 @@
       series: [{ type: "line", data: counts, itemStyle: { color: ink }, lineStyle: { color: accent }, areaStyle: { color: accent + "22" } }]
     });
     window.addEventListener("resize", () => c2.resize());
+
+    /* 各课游标推进折线（近 14 天已完成单元数，数据源 cursor_history） */
+    const pool = (window.CursorAPI ? CursorAPI.coursePool() : []);
+    if (pool.length && document.getElementById("chart-cursor")) {
+      const ch = Store.get("cursor_history", {});
+      const cDays = [...Array(14)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - 13 + i); return fmtDate(d); });
+      const colors = ["#5b8ff9", "#5ad8a6", "#f6bd16", "#e8684a", "#9270ca", "#5d7092"];
+      const series = pool.map((code, i) => {
+        let last = 0;
+        const data = cDays.map(d => {
+          const day = ch[d] || {};
+          if (day[code] !== undefined) last = day[code];
+          return last;
+        });
+        return { name: CursorAPI.poolLabel(code), type: "line", step: "end", showSymbol: false, data, lineStyle: { color: colors[i % colors.length] }, itemStyle: { color: colors[i % colors.length] } };
+      });
+      const c3 = echarts.init(document.getElementById("chart-cursor"), null, { renderer: "svg" });
+      c3.setOption({
+        animation: false,
+        tooltip: { appendToBody: true, trigger: "axis" },
+        legend: { textStyle: { color: muted }, top: 0 },
+        grid: { left: 40, right: 16, top: 40, bottom: 46 },
+        xAxis: { type: "category", data: cDays.map(x => x.slice(5)), axisLabel: { color: muted, fontSize: 10, rotate: 35 }, axisLine: { lineStyle: { color: rule } } },
+        yAxis: { type: "value", minInterval: 1, name: "已完成单元", axisLabel: { color: muted }, splitLine: { lineStyle: { color: rule } }, nameTextStyle: { color: muted } },
+        series
+      });
+      window.addEventListener("resize", () => c3.resize());
+    }
   }
 
   /* ================= Anki 导出 ================= */
@@ -240,6 +275,8 @@
     renderGoals();
     renderStats();
     renderAnkiLists();
+    /* 今日计划变化（完成/跳过/游标同步）时刷新番茄钟目标与看板 */
+    document.addEventListener("heuprep:plan-changed", () => { renderPomoTargets(); renderStats(); });
     document.getElementById("pomo-start").addEventListener("click", e => {
       if (pomoState.running) {
         clearInterval(pomoState.timer); pomoState.running = false;

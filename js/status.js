@@ -44,6 +44,19 @@
           <div class="plan-pct">${s.percent || 0}%<small>（${s.done || 0}/${s.total || 0} 节${s.skipped ? ` · 跳过 ${s.skipped}` : ""}）</small></div>
         </div>
         <div class="prog big"><div class="prog-fill" style="width:${s.percent || 0}%"></div></div>
+        ${(() => {
+          /* 各课小计：今日完成/任务数与笔记张数 */
+          const by = {};
+          (p.lessons || []).forEach(l => {
+            const c = l.course || String(l.label || "").split(" · ")[0] || "其他";
+            by[c] = by[c] || { total: 0, done: 0, notes: 0 };
+            by[c].total++;
+            if (l.status === "done") by[c].done++;
+            by[c].notes += (l.photos || []).length;
+          });
+          const rows = Object.entries(by).map(([c, v]) => `<span class="badge ${v.done >= v.total && v.total ? "ok" : "warnb"}">${esc(c)}：${v.done}/${v.total}${v.notes ? ` · 笔记 ${v.notes} 张` : ""}</span>`).join(" ");
+          return rows ? `<div class="course-sum">${rows}</div>` : "";
+        })()}
         ${lessons || `<div class="notice empty">快照里没有课程明细。</div>`}
       </div>`;
     }).join("");
