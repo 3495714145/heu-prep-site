@@ -195,7 +195,6 @@
     if (refresh) refresh.style.display = "none";
     root.innerHTML = `
       <div class="query-gate">
-        <p class="muted" style="margin-bottom:18px;">点击查询后才会展现当前打卡进度（同一设备一天内第 2 次查询有抽奖机会）。</p>
         <button class="btn" id="status-query">🔍 查询当前打卡进度</button>
       </div>`;
     document.getElementById("status-query").addEventListener("click", async () => {
