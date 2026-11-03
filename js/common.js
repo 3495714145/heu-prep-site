@@ -19,7 +19,7 @@ const Store = {
 /* ---------- 导航 ---------- */
 /* 全站共享的打卡频道（ntfy.sh）：所有设备打卡都发布到这里，监视页 status.html 默认实时显示所有人的最新打卡。
    如需"重置/换频道"，改这个字符串即可（改为其他随机串）。 */
-window.CHECKIN_TOPIC = "yyy-prep-live-3f8a2c91e6b7";
+window.CHECKIN_TOPIC = "yyy-prep-live-4c7b19e2a8d53f60";
 /* 打卡身份配置（多人拓展接口）：
    - multiUser: false（当前单人模式）——页面不显示昵称输入，统一用 defaultName 身份打卡/恢复；
    - 拓展多人时改为 true：study 页恢复昵称输入框，各人按昵称分身份打卡，监视页按昵称分卡。 */

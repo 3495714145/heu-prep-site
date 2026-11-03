@@ -242,6 +242,48 @@
     }
   }
 
+  /* ---------- 抽奖动态（A 端学习端）：订阅共享频道，监视端抽中奖金额实时提醒 ---------- */
+  let lotteryEs = null;
+  function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+  function onLottery(d) {
+    const feed = Store.get("lottery_feed", []);
+    feed.unshift({ device: d.device || "", amount: d.amount, date: d.date || "", time: d.time || "" });
+    Store.set("lottery_feed", feed.slice(0, 5));
+    renderLotteryFeed();
+    toastMsg(`🎉 监视端抽中 ¥${Number(d.amount).toFixed(2)}！`);
+  }
+  function renderLotteryFeed() {
+    const el = document.getElementById("lottery-feed");
+    if (!el) return;
+    const feed = Store.get("lottery_feed", []);
+    el.innerHTML = feed.length
+      ? `<div class="muted" style="font-size:13px;margin-top:8px;"><strong>🎁 最近抽奖动态</strong></div>` + feed.map(f =>
+          `<div style="font-size:13px;margin-top:4px;">🎁 ${escHtml(f.date)} ${escHtml(f.time)} · 设备 ${escHtml(String(f.device).slice(0, 9))}… 抽中 <strong style="color:#e63946;">¥${escHtml(Number(f.amount).toFixed(2))}</strong></div>`).join("")
+      : "";
+  }
+  function toastMsg(text) {
+    const t = document.createElement("div");
+    t.className = "lot-toast";
+    t.textContent = text;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 5000);
+  }
+  function connectLottery() {
+    const topic = todayTopic();
+    if (!topic || lotteryEs) return;
+    try {
+      lotteryEs = new EventSource(`${CLOUD}/${topic}/sse?since=12h`);
+      lotteryEs.onmessage = ev => {
+        try {
+          const m = JSON.parse(ev.data);
+          if (m.event !== "message" || !m.message) return;
+          const d = JSON.parse(m.message);
+          if (d && d.app === "yyy-lottery") onLottery(d);
+        } catch (e) { /* 非抽奖消息忽略 */ }
+      };
+    } catch (e) { /* 网络不可达时静默，不影响打卡功能 */ }
+  }
+
   function renderCloudPanel() {
     const root = document.getElementById("cloud-panel");
     if (!root) return;
@@ -262,8 +304,10 @@
       <label style="font-size:13px;display:block;margin-top:8px;"><input type="checkbox" id="cloud-auto" ${auto ? "checked" : ""}> 完成课程时自动同步到云端</label>
       <div id="cloud-status" style="margin-top:8px;font-size:13px;">${hasTopic
         ? (last ? `上次打卡：${new Date(last).toLocaleString("zh-CN", { hour12: false })} · 共享频道已就绪` : "共享频道已就绪，尚未打卡")
-        : "共享频道已就绪"}</div>`;
+        : "共享频道已就绪"}</div>
+      <div id="lottery-feed"></div>`;
 
+    renderLotteryFeed();
     document.getElementById("checkin-now").addEventListener("click", () => {
       const ni = document.getElementById("checkin-name");
       if (ni) Store.set("checkin_name", ni.value.trim());
@@ -463,6 +507,8 @@
     if (Store.get("checkin_name", "").trim()) await restoreFromCloud(true);
     /* 开自动同步：进页静默同步一次（全站共享频道常驻） */
     if (Store.get("cloud_auto", true)) pushCloud(true);
+    /* 抽奖动态：实时接收监视端抽奖结果 */
+    connectLottery();
     const refresh = document.getElementById("plan-refresh");
     if (refresh) refresh.addEventListener("click", renderPlan);
   });

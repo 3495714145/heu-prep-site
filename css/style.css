@@ -366,3 +366,16 @@ footer a { color: var(--accent); }
 .custom-form select { border: 1px solid var(--rule); border-radius: 980px; padding: 8px 12px; font-size: 14px; }
 .cf-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .status-card { background: var(--card-bg, #fff); border: 1px solid var(--rule); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+/* 查询入口与抽奖弹窗（监视页） */
+.query-gate { text-align: center; padding: 48px 16px; }
+.query-gate .btn { font-size: 17px; padding: 12px 46px; }
+.lottery-mask { position: fixed; inset: 0; background: rgba(0,0,0,.72); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+.lottery-card { background: #fff; color: #222; border-radius: 20px; padding: 30px 34px; max-width: 340px; width: 88vw; text-align: center; box-shadow: 0 24px 70px rgba(0,0,0,.45); }
+.lottery-card h3 { margin: 0 0 10px; font-size: 22px; }
+.lottery-card .lt-desc { font-size: 14px; color: #666; margin: 0 0 18px; line-height: 1.6; }
+.lottery-card .lt-amount { font-size: 40px; font-weight: 700; color: #e63946; margin: 10px 0 4px; }
+.lottery-card .btn { width: 100%; font-size: 16px; padding: 12px 0; }
+.lottery-card .lt-spin { opacity: .7; }
+@keyframes lt-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.lottery-card .lt-amount { animation: lt-pop .35s ease-out; }
+.lot-toast { position: fixed; left: 50%; bottom: 34px; transform: translateX(-50%); background: #222; color: #fff; padding: 11px 20px; border-radius: 999px; font-size: 14px; z-index: 10001; box-shadow: 0 10px 30px rgba(0,0,0,.35); }
