@@ -20,7 +20,7 @@
     if (!profiles.size) return;
     /* 按打卡时间倒序（updated_at 为 "YYYY-MM-DD HH:MM:SS"，字典序即时间序） */
     const list = [...profiles.values()].sort((a, b) => String(b.updated_at || "").localeCompare(String(a.updated_at || "")));
-    meta.textContent = `共 ${list.length} 位学习者 · 实时连接中（快照保留约 12 小时）`;
+    meta.textContent = `频道：${topicFromUrl()} · 共 ${list.length} 位学习者 · 实时连接中（快照保留约 12 小时）`;
     root.innerHTML = list.map(p => {
       const s = p.summary || {};
       const lessons = (p.lessons || []).map(l => `
@@ -61,6 +61,8 @@
     meta.textContent = "";
     try {
       es = new EventSource(`${CLOUD}/${topic}/sse?since=12h`);
+      meta.textContent = `频道：${topic} · 正在连接实时推送…`;
+      es.onopen = () => { meta.textContent = `频道：${topic} · 实时连接中`; };
       es.onmessage = ev => {
         try {
           const m = JSON.parse(ev.data);
@@ -73,7 +75,7 @@
         } catch (e) { /* 非打卡消息忽略 */ }
       };
       es.onerror = () => {
-        meta.textContent = "实时连接断开，自动重连中…（也可点「立即刷新」）";
+        meta.textContent = "实时连接断开/失败，自动重连中…（多为当前网络无法直连 ntfy.sh，可切换网络后点「立即刷新」）";
       };
     } catch (e) {
       root.innerHTML = `<div class="notice empty"><strong>无法建立实时连接（${esc(e.message)}）。</strong>请检查网络后点「立即刷新」重试。</div>`;
