@@ -117,6 +117,7 @@
       const st = blockStatus(v.block);
       const ph = photoOf(v.block.id);
       return {
+        id: v.block.id,
         time: v.time,
         label: v.label,
         track: v.block.track,
@@ -136,6 +137,51 @@
       summary: { total: lessons.length, done, skipped, pending: lessons.length - done - skipped, percent: lessons.length ? Math.round(done / lessons.length * 100) : 0 },
       lessons
     };
+  }
+
+  /* ---------- 跨设备进度互通：按昵称从云端恢复今日完成状态与照片 ---------- */
+  function applySnapshot(snap, items) {
+    const ov = Store.get("block_overrides", {});
+    const ph = Store.get("lesson_photos", {});
+    (snap.lessons || []).forEach(l => {
+      const v = items.find(x => x.block.id === l.id) || items.find(x => x.label === l.label && x.time === l.time);
+      if (!v) return;
+      const b = v.block;
+      if (l.status === "pending") delete ov[b.id];
+      else ov[b.id] = { status: l.status, reason: (ov[b.id] && ov[b.id].reason) || "", done_at: l.done_at || "" };
+      if ((l.photos || []).length && !(ph[b.id] && ph[b.id].date === todayISO())) {
+        ph[b.id] = { date: todayISO(), url: l.photos[0], ts: l.done_at || snap.updated_at || "" };
+      }
+    });
+    Store.set("block_overrides", ov);
+    Store.set("lesson_photos", ph);
+  }
+  async function restoreFromCloud(silent) {
+    const name = Store.get("checkin_name", "").trim();
+    if (!name) { if (!silent) alert("请先在上方填写昵称，再恢复云端进度。"); return false; }
+    try {
+      const res = await fetchTimeout(`${CLOUD}/${todayTopic()}/json?poll=1&since=12h`);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      const items = todayItems();
+      let found = false;
+      text.trim().split(/\n/).forEach(line => {
+        try {
+          const m = JSON.parse(line);
+          if (m.event !== "message" || !m.message) return;
+          const snap = JSON.parse(m.message);
+          if (!snap || snap.app !== "yyy-prep-checkin" || (snap.name || "匿名学习者") !== name) return;
+          if (snap.date !== todayISO()) return; /* 只恢复今天的快照 */
+          applySnapshot(snap, items); found = true; /* poll 按时间正序，后一条覆盖，最终为该昵称最新状态 */
+        } catch (e) { /* 跳过坏行 */ }
+      });
+      if (found) { renderPlan(); if (!silent) alert(`已从云端恢复「${name}」的今日进度。`); return true; }
+      if (!silent) alert("云端 12 小时内没有该昵称的今日打卡记录。");
+      return false;
+    } catch (e) {
+      if (!silent) alert("恢复失败：" + (e.name === "AbortError" ? "请求超时" : e.message));
+      return false;
+    }
   }
 
   /* ---------- 云端同步（ntfy.sh 公开频道：免注册、国内可达、SSE 实时；快照保留约 12 小时） ---------- */
@@ -204,18 +250,24 @@
       <div class="cloud-form">
         <input id="checkin-name" type="text" placeholder="昵称（可选）" value="${name}" maxlength="20">
         <button class="btn" id="checkin-now">立即打卡</button>
+        <button class="btn ghost" id="cloud-restore" title="按昵称拉取云端最新打卡，恢复本机的完成状态与笔记照片">↺ 恢复云端进度</button>
         ${hasTopic ? `<button class="btn ghost" id="cloud-copy">复制监视链接</button>
         <a class="btn ghost" href="status.html" target="_blank" rel="noopener">打开监视页</a>` : ""}
       </div>
       <label style="font-size:13px;display:block;margin-top:8px;"><input type="checkbox" id="cloud-auto" ${auto ? "checked" : ""}> 完成课程时自动同步到云端</label>
       <div id="cloud-status" style="margin-top:8px;font-size:13px;">${hasTopic
-        ? (last ? `上次打卡：${new Date(last).toLocaleString("zh-CN", { hour12: false })} · 共享频道已就绪` : "共享频道已就绪，尚未打卡")}</div>`;
+        ? (last ? `上次打卡：${new Date(last).toLocaleString("zh-CN", { hour12: false })} · 共享频道已就绪` : "共享频道已就绪，尚未打卡")
+        : "共享频道已就绪"}</div>`;
 
     document.getElementById("checkin-now").addEventListener("click", () => {
       Store.set("checkin_name", document.getElementById("checkin-name").value.trim());
       pushCloud(false);
     });
     document.getElementById("cloud-auto").addEventListener("change", e => Store.set("cloud_auto", e.target.checked));
+    document.getElementById("cloud-restore").addEventListener("click", () => {
+      Store.set("checkin_name", document.getElementById("checkin-name").value.trim());
+      restoreFromCloud(false);
+    });
     const copy = document.getElementById("cloud-copy");
     if (copy) copy.addEventListener("click", () => {
       const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "status.html";
@@ -396,12 +448,14 @@
     bindCustomForm();
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     if (!document.getElementById("today-plan-root")) return;
     renderPlan();
     renderCloudPanel();
-    /* 已有私有频道且开自动同步：进页静默同步一次 */
-    if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) pushCloud(true);
+    /* 跨设备互通：本机填过昵称时，进页先按昵称恢复云端最新进度 */
+    if (Store.get("checkin_name", "").trim()) await restoreFromCloud(true);
+    /* 开自动同步：进页静默同步一次（全站共享频道常驻） */
+    if (Store.get("cloud_auto", true)) pushCloud(true);
     const refresh = document.getElementById("plan-refresh");
     if (refresh) refresh.addEventListener("click", renderPlan);
   });
