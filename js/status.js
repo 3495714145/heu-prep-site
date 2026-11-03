@@ -18,10 +18,14 @@
       <div class="plan-lesson ${l.track || ""} ${l.status}">
         <div class="pl-head">
           <span class="pl-time">${esc(l.time || "")}</span>
-          <div class="pl-goal"><div class="pl-goal-text">${esc(l.label || "")}</div></div>
+          <div class="pl-goal">
+            <div class="pl-goal-text">${esc(l.label || "")}</div>
+            ${l.done_at ? `<div class="pl-ts muted">打卡时间：${esc(l.done_at)}</div>` : ""}
+          </div>
           <span class="badge ${l.status === "done" ? "ok" : l.status === "skipped" ? "miss" : "warnb"}">${l.status === "done" ? "已完成" : l.status === "skipped" ? "已跳过" : "进行中/待完成"}</span>
         </div>
         <div class="prog"><div class="prog-fill" style="width:${l.status === "done" ? 100 : 0}%"></div></div>
+        ${(l.photos || []).length ? `<div class="pl-photos">${(l.photos || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="打卡笔记照片"></a>`).join("")}<span class="muted pl-ts">点击查看笔记原图</span></div>` : ""}
       </div>`).join("");
     root.innerHTML = `
       <div class="plan-summary">

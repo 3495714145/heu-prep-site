@@ -13,16 +13,69 @@
   }
   function setStatus(b, status, reason) {
     const ov = Store.get("block_overrides", {});
-    if (status === "pending") delete ov[b.id]; else ov[b.id] = { status, reason: reason || "" };
+    if (status === "pending") delete ov[b.id];
+    else ov[b.id] = {
+      status, reason: reason || "",
+      done_at: status === "done"
+        ? (ov[b.id] && ov[b.id].done_at) || new Date().toLocaleString("zh-CN", { hour12: false })
+        : (ov[b.id] && ov[b.id].done_at) || ""
+    };
     Store.set("block_overrides", ov);
   }
+  function doneAtOf(b) {
+    const ov = Store.get("block_overrides", {});
+    return (ov[b.id] && ov[b.id].done_at) || "";
+  }
+  /* ---------- 笔记照片（压缩后经 ntfy.sh 附件上传，随快照保留约 12 小时） ---------- */
+  function photoOf(id) {
+    const p = Store.get("lesson_photos", {})[id];
+    return p && p.date === todayISO() ? p : null;
+  }
+  function setPhoto(id, url) {
+    const m = Store.get("lesson_photos", {});
+    m[id] = { date: todayISO(), url, ts: new Date().toLocaleString("zh-CN", { hour12: false }) };
+    Store.set("lesson_photos", m);
+  }
+  function compressImage(file) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const max = 1280, scale = Math.min(1, max / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(b => b ? res(b) : rej(new Error("压缩失败")), "image/jpeg", 0.72);
+        } catch (e) { rej(e); }
+      };
+      img.onerror = () => rej(new Error("图片读取失败"));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+  async function uploadPhoto(topic, blob, name) {
+    const res = await fetchTimeout(CLOUD + "/" + topic, {
+      method: "POST",
+      headers: { "X-Filename": name, "X-Title": "Study Note", "Accept": "application/json" },
+      body: blob
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const j = await res.json();
+    if (!j.attachment || !j.attachment.url) throw new Error("未返回附件地址");
+    return j.attachment.url;
+  }
   function buildPayload(blocks, name) {
-    const lessons = blocks.map(b => ({
-      time: `${S.PERIODS[b._p].start}–${S.PERIODS[b._p].end}`,
-      label: `${subjectName(b.subject)} · ${b.content_title}`,
-      track: b.track,
-      status: blockStatus(b)
-    }));
+    const lessons = blocks.map(b => {
+      const st = blockStatus(b);
+      const ph = photoOf(b.id);
+      return {
+        time: `${S.PERIODS[b._p].start}–${S.PERIODS[b._p].end}`,
+        label: `${subjectName(b.subject)} · ${b.content_title}`,
+        track: b.track,
+        status: st,
+        done_at: st === "done" ? doneAtOf(b) : "",
+        photos: ph ? [ph.url] : []
+      };
+    });
     const done = lessons.filter(l => l.status === "done").length;
     const skipped = lessons.filter(l => l.status === "skipped").length;
     return {
@@ -150,6 +203,7 @@
 
     const cards = blocks.map(b => {
       const st = blockStatus(b);
+      const ph = photoOf(b.id);
       const pd = S.PERIODS[b._p];
       return `
       <div class="plan-lesson ${b.track} ${st}" data-id="${b.id}">
@@ -162,9 +216,12 @@
           <span class="badge ${st === "done" ? "ok" : st === "skipped" ? "miss" : "warnb"}">${st === "done" ? "已完成" : st === "skipped" ? "已跳过" : "待完成"}</span>
         </div>
         <div class="prog"><div class="prog-fill" style="width:${st === "done" ? 100 : 0}%"></div></div>
+        ${ph ? `<div class="pl-photos"><a href="${ph.url}" target="_blank" rel="noopener"><img src="${ph.url}" alt="打卡笔记照片"></a><span class="muted pl-ts">笔记 ${ph.ts}</span></div>` : ""}
+        ${st === "done" && !ph && doneAtOf(b) ? `<div class="muted pl-ts">打卡时间：${doneAtOf(b)}</div>` : ""}
         <div class="pl-actions">
           ${st !== "done" ? `<button class="btn small" data-act="done" data-id="${b.id}">完成（100%）</button>` : `<button class="btn small ghost" data-act="reset" data-id="${b.id}">撤销完成</button>`}
           ${st !== "skipped" && st !== "done" ? `<button class="btn small ghost" data-act="skip" data-id="${b.id}">跳过</button>` : ""}
+          <label class="btn small ghost pl-photo-btn">📷 笔记打卡<input type="file" accept="image/*" hidden data-photo="${b.id}"></label>
         </div>
       </div>`;
     }).join("");
@@ -179,6 +236,30 @@
         else setStatus(blocks.find(b => b.id === id), "pending");
         renderPlan();
         if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
+      });
+    });
+
+    /* 笔记照片：压缩上传后自动完成该节打卡 */
+    root.querySelectorAll("input[data-photo]").forEach(inp => {
+      inp.addEventListener("change", async () => {
+        const id = inp.dataset.photo;
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        const b = blocks.find(x => x.id === id);
+        const st = document.getElementById("cloud-status");
+        try {
+          if (st) st.textContent = "笔记照片上传中…";
+          const blob = await compressImage(f);
+          const url = await uploadPhoto(todayTopic(), blob, "note-" + id.replace(/[^a-zA-Z0-9]/g, "") + "-" + Date.now() + ".jpg");
+          setPhoto(id, url);
+          if (b) setStatus(b, "done");
+          if (st) st.innerHTML = `<span class="badge ok">笔记已上传，已完成该节打卡</span>`;
+          renderPlan();
+          if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
+        } catch (e) {
+          const msg = e.name === "AbortError" ? "请求超时" : e.message;
+          if (st) st.innerHTML = `<span class="badge miss">笔记上传失败</span> ${msg}（可稍后重试）`;
+        }
       });
     });
   }

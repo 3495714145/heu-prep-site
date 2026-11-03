@@ -354,3 +354,6 @@ footer a { color: var(--accent); }
 .cloud-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
 .cloud-form input[type="text"] { flex: 1 1 140px; border: 1px solid var(--rule); border-radius: 980px; padding: 8px 14px; font-size: 14px; outline: none; }
 .cloud-form input[type="text"]:focus { border-color: var(--accent); }
+.pl-photos { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.pl-photos img { width: 88px; height: 66px; object-fit: cover; border-radius: 8px; border: 1px solid var(--rule); }
+.pl-ts { font-size: 12px; }
