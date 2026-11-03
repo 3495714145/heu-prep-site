@@ -365,3 +365,4 @@ footer a { color: var(--accent); }
 .custom-form input[type="text"]:focus { border-color: var(--accent); }
 .custom-form select { border: 1px solid var(--rule); border-radius: 980px; padding: 8px 12px; font-size: 14px; }
 .cf-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.status-card { background: var(--card-bg, #fff); border: 1px solid var(--rule); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }

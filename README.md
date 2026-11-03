@@ -24,8 +24,8 @@ heu-prep-site/
 ├── timeline.html       双轨时间线（confirmed/expected/tba 三种视觉样式）
 ├── schedule.html       日粒度滚动课表（引擎 A 自考 + 引擎 B 考研；自 2026-11-03 起排课，块含钟点时段）
 ├── quiz.html           刷题与错题本（仅显示来源自带答案）
-├── study.html          我的学习（今日学习计划：按课表排序 + 可自定义添加课程安排（仅当日）、每节课一个章节小节进度单元，支持📷笔记照片打卡与撤回（自动压缩上传 ntfy.sh 附件并完成打卡）+ 番茄钟 + 打卡 + 学习看板（ECharts）+ Anki 导出 + 打卡监视=自愿开启的 ntfy.sh 随机私有频道实时同步，仅上传课程完成状态）
-├── status.html         学习状态监视页（只读公开页，通过打卡生成的 ?topic= 链接访问，SSE 实时推送；显示各节打卡时间戳与笔记照片（页内灯箱预览）；数据经 ntfy.sh，快照与照片保留约 12 小时）
+├── study.html          我的学习（今日学习计划：按课表排序 + 可自定义添加课程安排（仅当日）、每节课一个章节小节进度单元，支持📷笔记照片打卡与撤回（自动压缩上传 ntfy.sh 附件并完成打卡）+ 番茄钟 + 打卡 + 学习看板（ECharts）+ Anki 导出 + 打卡监视=发布到全站共享 ntfy.sh 频道（CHECKIN_TOPIC 常量），仅上传课程完成状态）
+├── status.html         学习状态监视页（只读公开页，默认读取全站共享频道 CHECKIN_TOPIC（也可 ?topic= 指定），SSE 实时推送；所有人最新打卡按昵称分卡展示，含打卡时间戳与笔记照片灯箱预览；数据经 ntfy.sh，快照与照片保留约 12 小时）
 ├── css/style.css       苹果官网风格设计系统
 ├── js/                 data.js（权威数据源）+ deep.js（大纲逐章知识点/笔记考点深挖数据）+ notes_deep.js（课程笔记数据，window.NOTES_DEEP）+ papers.js + ai_float.js（全站悬浮 AI 助手，内嵌豆包）+ search.js（全站搜索引擎）+ materials_data.js（考前资料清单）+ 各页逻辑 + common.js
 ├── materials/          考前资料本地镜像（按课程分目录，31 份文件，源自 HEUOpenResource/heu-icicles）

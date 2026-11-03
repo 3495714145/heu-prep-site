@@ -17,6 +17,9 @@ const Store = {
 };
 
 /* ---------- 导航 ---------- */
+/* 全站共享的打卡频道（ntfy.sh）：所有设备打卡都发布到这里，监视页 status.html 默认实时显示所有人的最新打卡。
+   如需"重置/换频道"，改这个字符串即可（改为其他随机串）。 */
+window.CHECKIN_TOPIC = "yyy-prep-live-3f8a2c91e6b7";
 const NAV_ITEMS = [
   { href: "index.html", label: "首页" },
   { href: "zikao.html", label: "自考专区" },

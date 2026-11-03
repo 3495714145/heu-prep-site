@@ -151,6 +151,11 @@
   }
 
   function todayTopic() {
+    /* 全站共享公共频道（common.js 定义），保证 A/B/C 任意端打卡互相可见 */
+    return (window.CHECKIN_TOPIC || "").startsWith("yyy-prep-") ? window.CHECKIN_TOPIC : todayTopicLegacy();
+  }
+  /* 兼容：未定义公共频道时退回本机私有频道 */
+  function todayTopicLegacy() {
     let t = Store.get("checkin_topic", "");
     if (!t) {
       const a = new Uint8Array(10);
@@ -175,7 +180,7 @@
       });
       if (!res.ok) throw new Error("HTTP " + res.status);
       Store.set("cloud_last_push", new Date().toISOString());
-      if (statusEl) statusEl.innerHTML = `<span class="badge ok">已同步</span> 监视链接：<code>status.html?topic=${topic}</code>`;
+      if (statusEl) statusEl.innerHTML = `<span class="badge ok">已同步</span> 所有人可在 <a href="status.html" target="_blank" rel="noopener">监视页</a> 实时查看`;
       renderCloudPanel();
       return true;
     } catch (e) {
@@ -189,23 +194,22 @@
   function renderCloudPanel() {
     const root = document.getElementById("cloud-panel");
     if (!root) return;
-    const hasTopic = !!Store.get("checkin_topic", "");
+    const hasTopic = true; /* 全站共享频道常驻 */
     const name = Store.get("checkin_name", "");
     const last = Store.get("cloud_last_push", "");
     const auto = Store.get("cloud_auto", true);
     root.innerHTML = `
       <h3>打卡监视（云端）</h3>
-      <p class="muted">打卡后状态发布到 ntfy.sh 的<strong>随机私有频道</strong>（免注册）；对方打开监视链接即可实时看到你的学习状态（SSE 实时推送，快照保留约 12 小时）。仅上传课程完成状态，不含个人隐私。</p>
+      <p class="muted">打卡后状态发布到<strong>全站共享频道</strong>（ntfy.sh，SSE 实时推送）；任何人打开<a href="status.html" target="_blank" rel="noopener">监视页</a>即可实时看到所有人的最新打卡（快照保留约 12 小时）。仅上传课程完成状态，不含个人隐私。</p>
       <div class="cloud-form">
         <input id="checkin-name" type="text" placeholder="昵称（可选）" value="${name}" maxlength="20">
         <button class="btn" id="checkin-now">立即打卡</button>
         ${hasTopic ? `<button class="btn ghost" id="cloud-copy">复制监视链接</button>
-        <a class="btn ghost" href="status.html?topic=${Store.get("checkin_topic", "")}" target="_blank" rel="noopener">打开监视页</a>` : ""}
+        <a class="btn ghost" href="status.html" target="_blank" rel="noopener">打开监视页</a>` : ""}
       </div>
       <label style="font-size:13px;display:block;margin-top:8px;"><input type="checkbox" id="cloud-auto" ${auto ? "checked" : ""}> 完成课程时自动同步到云端</label>
       <div id="cloud-status" style="margin-top:8px;font-size:13px;">${hasTopic
-        ? (last ? `上次打卡：${new Date(last).toLocaleString("zh-CN", { hour12: false })} · 频道已就绪` : "已创建私有频道，尚未打卡")
-        : "尚未创建私有频道，首次打卡自动创建。"}</div>`;
+        ? (last ? `上次打卡：${new Date(last).toLocaleString("zh-CN", { hour12: false })} · 共享频道已就绪` : "共享频道已就绪，尚未打卡")}</div>`;
 
     document.getElementById("checkin-now").addEventListener("click", () => {
       Store.set("checkin_name", document.getElementById("checkin-name").value.trim());
@@ -214,7 +218,7 @@
     document.getElementById("cloud-auto").addEventListener("change", e => Store.set("cloud_auto", e.target.checked));
     const copy = document.getElementById("cloud-copy");
     if (copy) copy.addEventListener("click", () => {
-      const url = location.origin + location.pathname.replace(/[^/]*$/, "") + `status.html?topic=${Store.get("checkin_topic", "")}`;
+      const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "status.html";
       (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject()).then(
         () => { copy.textContent = "已复制"; setTimeout(() => copy.textContent = "复制监视链接", 1500); },
         () => prompt("请手动复制监视链接：", url)
