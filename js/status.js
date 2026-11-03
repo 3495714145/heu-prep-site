@@ -24,18 +24,28 @@
     meta.textContent = `频道：${topicFromUrl()} · 共 ${list.length} 位学习者 · 实时连接中（快照保留约 12 小时）`;
     root.innerHTML = list.map(p => {
       const s = p.summary || {};
-      const lessons = (p.lessons || []).map(l => `
-        <div class="plan-lesson ${l.track || ""} ${l.status}">
-          <div class="pl-head">
-            <span class="pl-time">${esc(l.time || "")}</span>
-            <div class="pl-goal">
-              <div class="pl-goal-text">${esc(l.label || "")}</div>
-              ${l.done_at ? `<div class="pl-ts muted">打卡时间：${esc(l.done_at)}</div>` : ""}
-            </div>
-            <span class="badge ${l.status === "done" ? "ok" : l.status === "skipped" ? "miss" : "warnb"}">${l.status === "done" ? "已完成" : l.status === "skipped" ? "已跳过" : "进行中/待完成"}</span>
+      /* 每科一条：标题=该科最新打卡完的章节，笔记照片按打卡顺序一字排开 */
+      const byCourse = [];
+      const idx = {};
+      (p.lessons || []).forEach(l => {
+        const c = l.course || String(l.label || "").split(" · ")[0] || "其他";
+        if (!idx[c]) { idx[c] = { course: c, latest: l, photos: [], done: 0, total: 0, pending: [] }; byCourse.push(idx[c]); }
+        const g = idx[c];
+        g.total++;
+        if (l.status === "done") { g.done++; g.latest = l; } else { g.pending.push(l); }
+        (l.photos || []).forEach(u => g.photos.push(u));
+      });
+      const rows = byCourse.map(g => `
+        <div class="wall-row ${g.latest.track || ""}">
+          <div class="wall-head">
+            <span class="wall-time">${esc(g.latest.time || "")}</span>
+            <div class="wall-title">${esc(g.latest.label || g.course)}</div>
+            <span class="badge ${g.done ? "ok" : "warnb"}">${g.done ? `已完成 ${g.done} 节` : "进行中/待完成"}</span>
           </div>
-          <div class="prog"><div class="prog-fill" style="width:${l.status === "done" ? 100 : 0}%"></div></div>
-          ${(l.photos || []).length ? `<div class="pl-photos">${(l.photos || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener" class="pl-photo-link"><img src="${esc(u)}" alt="打卡笔记照片"></a>`).join("")}<span class="muted pl-ts">点击查看笔记原图</span></div>` : ""}
+          ${g.photos.length
+            ? `<div class="wall-photos">${g.photos.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener" class="pl-photo-link"><img src="${esc(u)}" alt="打卡笔记照片" loading="lazy"></a>`).join("")}<span class="muted pl-ts">点击查看笔记原图</span></div>`
+            : `<div class="muted pl-ts wall-empty">${g.done ? "该科今日暂无笔记照片" : "尚未打卡（交笔记照片即完成）"}</div>`}
+          ${g.pending.length ? `<div class="wall-pending muted">待完成：${g.pending.map(l => esc(l.label)).join("；")}</div>` : ""}
         </div>`).join("");
       return `
       <div class="status-card">
@@ -44,20 +54,7 @@
           <div class="plan-pct">${s.percent || 0}%<small>（${s.done || 0}/${s.total || 0} 节${s.skipped ? ` · 跳过 ${s.skipped}` : ""}）</small></div>
         </div>
         <div class="prog big"><div class="prog-fill" style="width:${s.percent || 0}%"></div></div>
-        ${(() => {
-          /* 各课小计：今日完成/任务数与笔记张数 */
-          const by = {};
-          (p.lessons || []).forEach(l => {
-            const c = l.course || String(l.label || "").split(" · ")[0] || "其他";
-            by[c] = by[c] || { total: 0, done: 0, notes: 0 };
-            by[c].total++;
-            if (l.status === "done") by[c].done++;
-            by[c].notes += (l.photos || []).length;
-          });
-          const rows = Object.entries(by).map(([c, v]) => `<span class="badge ${v.done >= v.total && v.total ? "ok" : "warnb"}">${esc(c)}：${v.done}/${v.total}${v.notes ? ` · 笔记 ${v.notes} 张` : ""}</span>`).join(" ");
-          return rows ? `<div class="course-sum">${rows}</div>` : "";
-        })()}
-        ${lessons || `<div class="notice empty">快照里没有课程明细。</div>`}
+        ${rows || `<div class="notice empty">快照里没有课程明细。</div>`}
       </div>`;
     }).join("");
   }

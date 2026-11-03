@@ -409,3 +409,14 @@ footer a { color: var(--accent); }
 .pv-box .pv-row { font-size: 13px; margin-top: 6px; line-height: 1.6; }
 /* 监视页各课小计 */
 .course-sum { margin: 10px 0 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+/* 监视页：每科一条 + 笔记照片一字排开 */
+.wall-row { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; margin-top: 10px; background: var(--card, #fff); }
+.wall-row.zikao { border-left: 4px solid var(--zk, #5b8ff9); }
+.wall-row.kaoyan { border-left: 4px solid var(--ky, #5ad8a6); }
+.wall-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wall-time { font-size: 12px; color: var(--muted, #888); white-space: nowrap; }
+.wall-title { font-weight: 700; flex: 1; min-width: 200px; line-height: 1.5; }
+.wall-photos { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; margin-top: 10px; }
+.wall-photos .pl-photo-link img { width: 92px; height: 92px; object-fit: cover; border-radius: 8px; border: 1px solid var(--rule); display: block; }
+.wall-pending { margin-top: 8px; font-size: 12.5px; line-height: 1.6; }
+.wall-empty { margin-top: 8px; font-size: 12.5px; }
