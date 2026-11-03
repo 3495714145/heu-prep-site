@@ -53,11 +53,11 @@
     if (l.date !== today) { l.date = today; l.entries = []; Store.set("day_log", l); }
     return l.entries;
   }
-  function logUnitBlock(id, label, time, track, custom, done_at) {
+  function logUnitBlock(id, label, time, track, custom, done_at, course) {
     if (!id) return;
     const e = dayLog();
     if (!e.some(x => x.id === id)) {
-      e.push({ id, label: label || "", time: time || "", track: track || "", custom: !!custom, done_at: done_at || "", _seq: e.length });
+      e.push({ id, label: label || "", time: time || "", track: track || "", custom: !!custom, done_at: done_at || "", course: course || "", _seq: e.length });
       Store.set("day_log", { date: todayISO(), entries: e });
     }
   }
@@ -66,7 +66,7 @@
     if (l.date === todayISO()) { l.entries = l.entries.filter(x => x.id !== id); Store.set("day_log", l); }
   }
 
-  /* ---------- 统一课程项（游标任务块 + 自定义块；紧迫度优先顺序由引擎排好，已完成归档折叠置底，自定义殿后） ---------- */
+  /* ---------- 统一课程项（游标任务块 + 自定义块；紧迫度优先；交图完成即从列表消失） ---------- */
   function todayItems() {
     const items = [];
     CursorAPI.todayUnitBlocks().forEach((b, i) => {
@@ -86,20 +86,8 @@
         label: `${b.subject} · ${b.content_title}`
       });
     });
-    /* 今日已完成/跳过但已被游标顶出当前窗口的任务：归档置底，不消失 */
-    const winIds = new Set(items.map(v => v.block.id));
-    dayLog().forEach(e => {
-      if (winIds.has(e.id)) return;
-      items.push({
-        block: { id: e.id, track: e.track, content_title: e.label, status: "pending" },
-        custom: e.custom, archived: true,
-        time: e.time || "—",
-        sortKey: "8" + String(e._seq || 0).padStart(3, "0"),
-        timeLabel: "打卡归档",
-        label: e.label
-      });
-    });
-    return items.sort((a, b2) => a.sortKey.localeCompare(b2.sortKey));
+    /* 完成即消失：列表只留待办；完成的任务经 day_log 进快照，监视端全天可见 */
+    return items.filter(v => blockStatus(v.block) !== "done").sort((a, b2) => a.sortKey.localeCompare(b2.sortKey));
   }
 
   /* ---------- 笔记照片（压缩后经 ntfy.sh 附件上传，随快照保留约 12 小时） ---------- */
@@ -168,6 +156,18 @@
         photos: ph ? [ph.url] : []
       };
     });
+    /* 今日归档（完成即消失的任务）继续进快照，监视端全天可见 */
+    const ids = new Set(lessons.map(l => l.id));
+    dayLog().forEach(e => {
+      if (ids.has(e.id)) return;
+      const ph = photoOf(e.id);
+      lessons.push({
+        id: e.id, time: e.time || "—", label: e.label, track: e.track,
+        course: e.course || "", custom: e.custom,
+        status: "done", done_at: e.done_at || "",
+        photos: ph ? [ph.url] : []
+      });
+    });
     const done = lessons.filter(l => l.status === "done").length;
     const skipped = lessons.filter(l => l.status === "skipped").length;
     return {
@@ -196,7 +196,7 @@
       if (!v) {
         /* 本机窗口外的任务（如跨设备恢复）：完成/跳过的记入今日归档，保证监视页全天可见 */
         if (l.status === "done" || l.status === "skipped") {
-          logUnitBlock(l.id, l.label || "", l.time || "", l.track || "", !!l.custom, l.done_at || "");
+          logUnitBlock(l.id, l.label || "", l.time || "", l.track || "", !!l.custom, l.done_at || "", l.course || "");
           if ((l.photos || []).length) {
             const ph = Store.get("lesson_photos", {});
             if (!(ph[l.id] && ph[l.id].date === todayISO())) {
@@ -513,17 +513,17 @@
     if (!root) return;
     const now = new Date();
     const items = todayItems();
-
-    const done = items.filter(v => blockStatus(v.block) === "done").length;
-    const skipped = items.filter(v => blockStatus(v.block) === "skipped").length;
-    const pct = items.length ? Math.round(done / items.length * 100) : 0;
+    const doneToday = dayLog().length;
+    const totalToday = doneToday + items.length;
+    const pct = totalToday ? Math.round(doneToday / totalToday * 100) : 0;
 
     const head = `
       <div class="plan-summary">
         <div class="plan-date">${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${WEEKDAYS[(now.getDay() + 6) % 7]}</div>
         <div style="display:flex;align-items:center;gap:12px;">
           <button class="btn small ghost" id="custom-add">＋ 自定义安排</button>
-          <div class="plan-pct">${pct}%<small>（${done}/${items.length} 项${skipped ? ` · 跳过 ${skipped}` : ""}）</small></div>
+          ${doneToday ? `<button class="btn small ghost" id="undo-last">撤回最近一节</button>` : ""}
+          <div class="plan-pct">${pct}%<small>（已完成 ${doneToday} 节 · 待完成 ${items.length} 项）</small></div>
         </div>
       </div>
       <div class="prog big"><div class="prog-fill" style="width:${pct}%"></div></div>
@@ -539,29 +539,22 @@
     }
 
     const cards = items.map(v => {
-      const b = v.block, st = blockStatus(b), ph = photoOf(b.id);
+      const b = v.block;
       const badgeHtml = v.custom
         ? (b.track === "custom" ? `<span class="badge code">自定义</span>` : badge(b.track))
         : badge(b.track);
       return `
-      <div class="plan-lesson ${b.track === "custom" ? "" : b.track} ${st}${v.archived ? " folded" : ""}" data-id="${b.id}">
+      <div class="plan-lesson ${b.track === "custom" ? "" : b.track}" data-id="${b.id}">
         <div class="pl-head">
           <span class="pl-time">${v.custom ? "自定义" : v.timeLabel}<br><strong>${v.time}</strong></span>
           <div class="pl-goal">
-            <div class="pl-goal-label">${v.archived ? "今日已完成：" : "今天要完成："}</div>
+            <div class="pl-goal-label">今天要完成：</div>
             <div class="pl-goal-text">${badgeHtml} ${v.label}</div>
           </div>
-          <span class="badge ${st === "done" ? "ok" : st === "skipped" ? "miss" : "warnb"}">${st === "done" ? "已完成" : st === "skipped" ? "已跳过" : "待完成"}</span>
+          <span class="badge warnb">待完成</span>
         </div>
-        <div class="prog"><div class="prog-fill" style="width:${st === "done" ? 100 : 0}%"></div></div>
-        ${ph ? `<div class="pl-photos"><a href="${ph.url}" target="_blank" rel="noopener" class="pl-photo-link"><img src="${ph.url}" alt="打卡笔记照片"></a><span class="muted pl-ts">笔记 ${ph.ts}</span><button class="btn small ghost" data-unphoto="${b.id}">撤回笔记</button></div>`
-             : (st === "done" && doneAtOf(b) ? `<div class="muted pl-ts">打卡时间：${doneAtOf(b)}</div>` : "")}
         <div class="pl-actions">
-          ${st === "done" ? `<button class="btn small ghost" data-act="reset" data-id="${b.id}">撤销完成</button>`
-            : (CursorAPI.isUnitId(b.id) ? `<span class="muted pl-note-hint">📌 完成本任务必须提交章节笔记照片，上传成功后自动完成并推进进度</span>`
-            : `<button class="btn small" data-act="done" data-id="${b.id}">完成（100%）</button>`)}
-          ${st !== "skipped" && st !== "done" ? `<button class="btn small ghost" data-act="skip" data-id="${b.id}">跳过</button>` : ""}
-          <label class="btn small ghost pl-photo-btn">📷 笔记打卡<input type="file" accept="image/*" hidden data-photo="${b.id}"></label>
+          <label class="btn small ghost pl-photo-btn">📷 交笔记完成本节<input type="file" accept="image/*" hidden data-photo="${b.id}"></label>
           ${v.custom ? `<button class="btn small ghost" data-delcustom="${b.id}">删除安排</button>` : ""}
         </div>
       </div>`;
@@ -571,57 +564,24 @@
     bindCustomButtons(root);
     bindCursorControls(root);
 
-    root.querySelectorAll("button[data-act]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const id = btn.dataset.id, act = btn.dataset.act;
-        const blk = items.find(v => v.block.id === id).block;
-        if (act === "done" && CursorAPI.isUnitId(id)) { alert("游标任务必须提交章节笔记照片才能完成：点「📷 笔记打卡」上传后自动完成并推进进度。"); return; }
-        if (act === "done") setStatus(blk, "done");
-        else if (act === "skip") setStatus(blk, "skipped", prompt("跳过原因（可选）：") || "");
-        else {
-          /* 撤销完成/跳过：联动撤回笔记照片 + 回退游标 + 清跳过记录 */
-          if (photoOf(id) && !confirm("撤销将同时撤回该任务的笔记照片（监视端同步消失），继续？")) return;
-          if (photoOf(id)) recallPhoto(id);
-          if (CursorAPI.isUnitId(id)) {
-            const pu = CursorAPI.parseUnitId(id);
-            const sk = Store.get("skipped_units", {});
-            if (sk[pu.code]) { sk[pu.code] = sk[pu.code].filter(i => i !== pu.idx); Store.set("skipped_units", sk); }
-            if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
-          }
-          setStatus(blk, "pending");
-        }
-        /* 打卡归档：完成/跳过记入今日日志（监视页全天可见）；撤销则移出归档 */
-        if (act === "done" || act === "skip") {
-          const v = items.find(x => x.block.id === id);
-          logUnitBlock(id, v ? v.label : blk.content_title, v ? v.time : "", blk.track, !!v && v.custom, doneAtOf(blk));
-        } else if (act === "reset") unlogUnitBlock(id);
-        /* 游标推进：完成/跳过即前进；撤销则回退到该单元（重新出现在今日计划里） */
-        if (CursorAPI.isUnitId(id)) {
-          const pu = CursorAPI.parseUnitId(id);
-          if (act === "done") CursorAPI.markUnitDone(pu.code, pu.idx);
-          else if (act === "skip") CursorAPI.skipUnit(pu.code, pu.idx);
-          /* reset 的游标回退与跳过清理已在上方联动处理 */
-        }
-        renderPlan();
-        if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
-      });
-    });
-
-    /* 撤回笔记照片（本地记录立即删除并重新同步；ntfy 附件随历史消息约 12 小时自动过期） */
-    root.querySelectorAll("button[data-unphoto]").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        if (!confirm("确定撤回该任务打卡笔记照片？（监视端将立即不再显示；游标任务将同时撤销完成并回退进度）")) return;
-        const uid = btn.dataset.unphoto;
-        recallPhoto(uid);
-        if (CursorAPI.isUnitId(uid)) {
-          const pu = CursorAPI.parseUnitId(uid);
-          const blk = items.find(v => v.block.id === uid).block;
-          if (blk) setStatus(blk, "pending");
-          if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
-        }
-        renderPlan();
-        if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
-      });
+    /* 撤回最近一节打卡（交错照片的后悔药）：删照片 + 撤销完成 + 游标回退 + 移出归档，监视端同步消失 */
+    const undoBtn = root.querySelector("#undo-last");
+    if (undoBtn) undoBtn.addEventListener("click", async () => {
+      const log = dayLog();
+      const last = log[log.length - 1];
+      if (!last) return;
+      if (!confirm(`撤回最近一节打卡「${last.label || last.id}」？\n照片将删除、完成撤销、游标回退，监视端同步消失。`)) return;
+      const uid = last.id;
+      recallPhoto(uid);
+      if (CursorAPI.isUnitId(uid)) {
+        const pu = CursorAPI.parseUnitId(uid);
+        if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
+      }
+      const blk = (items.find(v => v.block.id === uid) || {}).block;
+      if (blk) setStatus(blk, "pending");
+      unlogUnitBlock(uid);
+      renderPlan();
+      if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
     });
 
     /* 删除自定义安排 */
@@ -655,7 +615,7 @@
           if (st) st.innerHTML = `<span class="badge ok">笔记已上传，已完成该节打卡</span>`;
           {
             const v = items.find(x => x.block.id === id);
-            logUnitBlock(id, v ? v.label : id, v ? v.time : "", blk ? blk.track : "", !!v && v.custom, blk ? doneAtOf(blk) : "");
+            logUnitBlock(id, v ? v.label : id, v ? v.time : "", blk ? blk.track : "", !!v && v.custom, blk ? doneAtOf(blk) : "", blk ? courseLabelOf(blk) : "");
           }
           renderPlan();
           if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
