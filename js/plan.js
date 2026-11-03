@@ -51,7 +51,14 @@
     const today = todayISO();
     const l = Store.get("day_log", {});
     if (l.date !== today) { l.date = today; l.entries = []; Store.set("day_log", l); }
-    return l.entries;
+    /* 只认游标引擎的任务（u-/custom- 前缀）；旧课表引擎的历史打卡（d-/zk-/ky-/rv- 等）一律清除 */
+    const arr = l.entries || [];
+    const arr2 = arr.filter(e => {
+      const id = String(e.id || "");
+      return id.startsWith("u-") || id.startsWith("custom-");
+    });
+    if (arr2.length !== arr.length) { l.entries = arr2; Store.set("day_log", l); }
+    return arr2;
   }
   function logUnitBlock(id, label, time, track, custom, done_at, course) {
     if (!id) return;

@@ -28,6 +28,8 @@
       const byCourse = [];
       const idx = {};
       (p.lessons || []).forEach(l => {
+        /* 只认游标引擎的任务（u-/custom- 前缀），旧课表引擎的历史条目一律忽略 */
+        if (!/^(u-|custom-)/.test(String(l.id || ""))) return;
         const c = l.course || String(l.label || "").split(" · ")[0] || "其他";
         if (!idx[c]) { idx[c] = { course: c, latest: l, photos: [], done: 0, total: 0, pending: [] }; byCourse.push(idx[c]); }
         const g = idx[c];
