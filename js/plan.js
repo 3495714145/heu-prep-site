@@ -46,7 +46,27 @@
     Store.set("custom_blocks", m);
   }
 
-  /* ---------- 统一课程项（游标任务块 + 自定义块；紧迫度优先顺序由引擎排好，自定义殿后） ---------- */
+  /* ---------- 今日打卡归档：完成/跳过的游标任务保留到今天结束（监视页与学习端都不掉） ---------- */
+  function dayLog() {
+    const today = todayISO();
+    const l = Store.get("day_log", {});
+    if (l.date !== today) { l.date = today; l.entries = []; Store.set("day_log", l); }
+    return l.entries;
+  }
+  function logUnitBlock(id, label, time, track, custom, done_at) {
+    if (!id) return;
+    const e = dayLog();
+    if (!e.some(x => x.id === id)) {
+      e.push({ id, label: label || "", time: time || "", track: track || "", custom: !!custom, done_at: done_at || "", _seq: e.length });
+      Store.set("day_log", { date: todayISO(), entries: e });
+    }
+  }
+  function unlogUnitBlock(id) {
+    const l = Store.get("day_log", {});
+    if (l.date === todayISO()) { l.entries = l.entries.filter(x => x.id !== id); Store.set("day_log", l); }
+  }
+
+  /* ---------- 统一课程项（游标任务块 + 自定义块；紧迫度优先顺序由引擎排好，已完成归档折叠置底，自定义殿后） ---------- */
   function todayItems() {
     const items = [];
     CursorAPI.todayUnitBlocks().forEach((b, i) => {
@@ -64,6 +84,19 @@
         time: `${b.start}–${b.end}`, sortKey: "9" + b.start,
         timeLabel: "自定义时段",
         label: `${b.subject} · ${b.content_title}`
+      });
+    });
+    /* 今日已完成/跳过但已被游标顶出当前窗口的任务：归档置底，不消失 */
+    const winIds = new Set(items.map(v => v.block.id));
+    dayLog().forEach(e => {
+      if (winIds.has(e.id)) return;
+      items.push({
+        block: { id: e.id, track: e.track, content_title: e.label, status: "pending" },
+        custom: e.custom, archived: true,
+        time: e.time || "—",
+        sortKey: "8" + String(e._seq || 0).padStart(3, "0"),
+        timeLabel: "打卡归档",
+        label: e.label
       });
     });
     return items.sort((a, b2) => a.sortKey.localeCompare(b2.sortKey));
@@ -151,7 +184,20 @@
     const ph = Store.get("lesson_photos", {});
     (snap.lessons || []).forEach(l => {
       const v = items.find(x => x.block.id === l.id) || items.find(x => x.label === l.label && x.time === l.time);
-      if (!v) return;
+      if (!v) {
+        /* 本机窗口外的任务（如跨设备恢复）：完成/跳过的记入今日归档，保证监视页全天可见 */
+        if (l.status === "done" || l.status === "skipped") {
+          logUnitBlock(l.id, l.label || "", l.time || "", l.track || "", !!l.custom, l.done_at || "");
+          if ((l.photos || []).length) {
+            const ph = Store.get("lesson_photos", {});
+            if (!(ph[l.id] && ph[l.id].date === todayISO())) {
+              ph[l.id] = { date: todayISO(), url: l.photos[0], ts: l.done_at || snap.updated_at || "" };
+              Store.set("lesson_photos", ph);
+            }
+          }
+        }
+        return;
+      }
       const b = v.block;
       if (l.status === "pending") delete ov[b.id];
       else ov[b.id] = { status: l.status, reason: (ov[b.id] && ov[b.id].reason) || "", done_at: l.done_at || "" };
@@ -464,11 +510,11 @@
         ? (b.track === "custom" ? `<span class="badge code">自定义</span>` : badge(b.track))
         : badge(b.track);
       return `
-      <div class="plan-lesson ${b.track === "custom" ? "" : b.track} ${st}" data-id="${b.id}">
+      <div class="plan-lesson ${b.track === "custom" ? "" : b.track} ${st}${v.archived ? " folded" : ""}" data-id="${b.id}">
         <div class="pl-head">
           <span class="pl-time">${v.custom ? "自定义" : v.timeLabel}<br><strong>${v.time}</strong></span>
           <div class="pl-goal">
-            <div class="pl-goal-label">今天要完成：</div>
+            <div class="pl-goal-label">${v.archived ? "今日已完成：" : "今天要完成："}</div>
             <div class="pl-goal-text">${badgeHtml} ${v.label}</div>
           </div>
           <span class="badge ${st === "done" ? "ok" : st === "skipped" ? "miss" : "warnb"}">${st === "done" ? "已完成" : st === "skipped" ? "已跳过" : "待完成"}</span>
@@ -499,6 +545,11 @@
         if (act === "done") setStatus(blk, "done");
         else if (act === "skip") setStatus(blk, "skipped", prompt("跳过原因（可选）：") || "");
         else setStatus(blk, "pending");
+        /* 打卡归档：完成/跳过记入今日日志（监视页全天可见）；撤销则移出归档 */
+        if (act === "done" || act === "skip") {
+          const v = items.find(x => x.block.id === id);
+          logUnitBlock(id, v ? v.label : blk.content_title, v ? v.time : "", blk.track, !!v && v.custom, doneAtOf(blk));
+        } else if (act === "reset") unlogUnitBlock(id);
         /* 游标推进：完成/跳过即前进；撤销则回退到该单元（重新出现在今日计划里） */
         if (CursorAPI.isUnitId(id)) {
           const pu = CursorAPI.parseUnitId(id);
@@ -557,6 +608,10 @@
             CursorAPI.markUnitDone(pu.code, pu.idx);
           }
           if (st) st.innerHTML = `<span class="badge ok">笔记已上传，已完成该节打卡</span>`;
+          {
+            const v = items.find(x => x.block.id === id);
+            logUnitBlock(id, v ? v.label : id, v ? v.time : "", blk ? blk.track : "", !!v && v.custom, blk ? doneAtOf(blk) : "");
+          }
           renderPlan();
           if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
         } catch (e) {
