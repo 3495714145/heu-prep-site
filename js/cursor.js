@@ -263,7 +263,8 @@
       const f = forecast(code);
       groups.push({ code, blocks, key: f.percentByExam === null ? 101 : f.percentByExam });
     };
-    pushCourse(plan.main, "main", quotaFor(plan.main, true, offsetDays || 0));
+    const mq = quotaFor(plan.main, true, offsetDays || 0);
+    pushCourse(plan.main, "main", mq > 0 ? mq : 1); /* 主线学完也保留每天 1 个复盘块，与支线学完出复盘保持一致 */
     plan.sides.forEach(s => pushCourse(s.code, "side", 1));
     groups.sort((a, b) => a.key - b.key || (a.code === plan.main ? -1 : b.code === plan.main ? 1 : 0));
     const out = [];
