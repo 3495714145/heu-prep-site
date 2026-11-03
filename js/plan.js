@@ -83,7 +83,98 @@
     const m = Store.get("lesson_photos", {});
     delete m[id];
     Store.set("lesson_photos", m);
+    idbDel(id);
   }
+
+  /* ---------- 笔记历史：IndexedDB 本地永久归档（按日期分组浏览） ---------- */
+  let _idb = null;
+  function idb() {
+    if (_idb) return Promise.resolve(_idb);
+    return new Promise(res => {
+      try {
+        const rq = indexedDB.open("heuprep-notes", 1);
+        rq.onupgradeneeded = () => rq.result.createObjectStore("notes");
+        rq.onsuccess = () => { _idb = rq.result; res(_idb); };
+        rq.onerror = () => res(null);
+      } catch (e) { res(null); }
+    });
+  }
+  function idbPut(id, blob) {
+    return idb().then(db => db ? new Promise(res => {
+      try {
+        const tx = db.transaction("notes", "readwrite");
+        tx.objectStore("notes").put(blob, id);
+        tx.oncomplete = res; tx.onerror = res; tx.onabort = res;
+      } catch (e) { res(); }
+    }) : Promise.resolve());
+  }
+  function idbGet(id) {
+    return idb().then(db => db ? new Promise(res => {
+      try {
+        const rq = db.transaction("notes").objectStore("notes").get(id);
+        rq.onsuccess = () => res(rq.result || null);
+        rq.onerror = () => res(null);
+      } catch (e) { res(null); }
+    }) : Promise.resolve(null));
+  }
+  function idbDel(id) {
+    return idb().then(db => db ? new Promise(res => {
+      try {
+        const tx = db.transaction("notes", "readwrite");
+        tx.objectStore("notes").delete(id);
+        tx.oncomplete = res; tx.onerror = res; tx.onabort = res;
+      } catch (e) { res(); }
+    }) : Promise.resolve());
+  }
+
+  function unitLabelOf(id, date) {
+    if (CursorAPI.isUnitId(id)) {
+      const pu = CursorAPI.parseUnitId(id);
+      const units = CursorAPI.unitsOf(pu.code);
+      const u = units[pu.idx];
+      return `${CursorAPI.poolLabel(pu.code)} · ${u ? u.title : "第 " + (pu.idx + 1) + " 个单元"}`;
+    }
+    const m = Store.get("custom_blocks", {})[date] || [];
+    const b = m.find(x => x.id === id);
+    return b ? `${b.subject} · ${b.content_title}（自定义）` : "自定义任务";
+  }
+
+  function renderNoteHistory() {
+    const root = document.getElementById("note-history-root");
+    if (!root) return;
+    const ph = Store.get("lesson_photos", {});
+    const entries = Object.entries(ph).map(([id, p]) => ({ id, url: p.url, date: p.date, ts: p.ts }))
+      .filter(e => e.url).sort((a, b) => b.date.localeCompare(a.date) || String(b.ts).localeCompare(String(a.ts)));
+    if (!entries.length) {
+      root.innerHTML = `<div class="notice empty">还没有历史笔记。完成今日游标任务并提交章节笔记照片后，会自动永久归档在这里。</div>`;
+      return;
+    }
+    const byDate = {};
+    entries.forEach(e => (byDate[e.date] = byDate[e.date] || []).push(e));
+    root.innerHTML = `<p class="muted">共 ${entries.length} 张笔记（本地 IndexedDB 永久保存，跨日可查；远程附件过期条目自动改用本地原图显示）。</p>` +
+      Object.keys(byDate).sort().reverse().map(date => `
+      <div class="nh-date">
+        <h4>${date}</h4>
+        <div class="nh-grid">${byDate[date].map(e => `
+          <div class="nh-card">
+            <a href="${e.url}" target="_blank" rel="noopener" class="nh-img-link"><img src="${e.url}" loading="lazy" alt="笔记照片" data-nhid="${e.id}"></a>
+            <div class="nh-meta">${escHtml(unitLabelOf(e.id, e.date))}</div>
+            <div class="muted pl-ts">提交于 ${escHtml(e.ts || "—")}</div>
+          </div>`).join("")}</div>
+      </div>`).join("");
+    /* 远程附件过期（HTTP 失败）时改用本地 IndexedDB 原图显示 */
+    root.querySelectorAll("img[data-nhid]").forEach(img => {
+      img.addEventListener("error", async () => {
+        const blob = await idbGet(img.dataset.nhid);
+        if (blob) {
+          img.src = URL.createObjectURL(blob);
+          const a = img.closest("a");
+          if (a) a.href = img.src;
+        }
+      }, { once: true });
+    });
+  }
+
   function compressImage(file) {
     return new Promise((res, rej) => {
       const img = new Image();
@@ -455,6 +546,7 @@
       root.innerHTML = head + `<div class="notice empty"><strong>今天没有游标任务与自定义安排。</strong>可在上方「学习进度游标」里校准每门课学到哪了（或在本页下方「学习进度线」选择课程合集），也可点「＋ 自定义安排」添加今日任务。</div>`;
       bindCustomButtons(root);
       bindCursorControls(root);
+      renderNoteHistory();
       return;
     }
 
@@ -524,6 +616,7 @@
           if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
         }
         renderPlan();
+        renderNoteHistory();
         if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
       });
     });
@@ -550,6 +643,7 @@
           if (st) st.textContent = "笔记照片上传中…";
           const blob = await compressImage(f);
           const url = await uploadPhoto(todayTopic(), blob, "note-" + id.replace(/[^a-zA-Z0-9]/g, "") + "-" + Date.now() + ".jpg");
+          await idbPut(id, blob); /* 本地永久归档（ntfy 附件约 12 小时过期，IndexedDB 不过期） */
           setPhoto(id, url);
           if (blk) setStatus(blk, "done");
           if (blk && CursorAPI.isUnitId(id)) {
@@ -558,6 +652,7 @@
           }
           if (st) st.innerHTML = `<span class="badge ok">笔记已上传，已完成该节打卡</span>`;
           renderPlan();
+          renderNoteHistory();
           if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
         } catch (e) {
           const msg = e.name === "AbortError" ? "请求超时" : e.message;
