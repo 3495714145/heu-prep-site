@@ -127,6 +127,7 @@
     return pool.includes(m) ? m : (pool[0] || "");
   }
   function setMainCourse(code) {
+    if (!code) { Store.set("main_course", ""); return; } /* 允许取消主线，按紧迫度自动 */
     if (coursePool().includes(code)) Store.set("main_course", code);
   }
 

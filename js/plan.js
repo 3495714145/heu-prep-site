@@ -645,9 +645,74 @@
     bindCustomForm();
   }
 
+  /* ---------- 课程设置：自考选科 / 考研合集 / 主线课程 / 清空记录 ---------- */
+  function renderSettings() {
+    const zkList = document.getElementById("zk-subject-list");
+    if (zkList) {
+      const selectable = SITE_DATA.zikao.courses.filter(c => c.chapters || c.reference_chapters);
+      const sel = Store.get("zk_subjects", []);
+      zkList.innerHTML = selectable.map(c => `
+        <label class="check-item"><input type="checkbox" value="${c.code}" ${sel.includes(c.code) ? "checked" : ""}>
+          ${c.code} ${c.name}<span class="muted">（${(c.chapters || (c.reference_chapters && c.reference_chapters.chapters) || []).length} 个单元）</span></label>`).join("");
+      const save = document.getElementById("zk-subject-save");
+      if (save) save.addEventListener("click", () => {
+        const picked = [...zkList.querySelectorAll("input:checked")].map(i => i.value);
+        if (picked.length && picked.length < 2) { alert("自考选科至少 2 门（或全部不选，只学考研科目）。"); return; }
+        if (picked.length > 4) { alert("自考选科最多 4 门。"); return; }
+        Store.set("zk_subjects", picked);
+        const cur = Store.get("main_course", "");
+        if (cur && !picked.includes(cur) && !["数二", "英二", "408"].includes(cur)) Store.set("main_course", "");
+        alert("自考选科已保存，进度线已更新。");
+        renderPlan(); renderSettings();
+      });
+    }
+    const kyList = document.getElementById("ky-subject-list");
+    if (kyList) {
+      const all = ["数二", "英二", "408"];
+      const names = { "数二": "数学（二）", "英二": "英语（二）", "408": "408 计算机学科专业基础综合" };
+      const sel = Store.get("ky_subjects", all.slice());
+      kyList.innerHTML = all.map(c => `
+        <label class="check-item"><input type="checkbox" value="${c}" ${sel.includes(c) ? "checked" : ""}>${names[c]}</label>`).join("");
+      const save = document.getElementById("ky-subject-save");
+      if (save) save.addEventListener("click", () => {
+        const picked = [...kyList.querySelectorAll("input:checked")].map(i => i.value);
+        if (!picked.length) { alert("考研科目合集至少保留 1 门。"); return; }
+        Store.set("ky_subjects", picked);
+        const cur = Store.get("main_course", "");
+        if (cur && !picked.includes(cur) && !SITE_DATA.zikao.courses.some(x => x.code === cur)) Store.set("main_course", "");
+        alert("考研合集已保存，进度线已更新。");
+        renderPlan(); renderSettings();
+      });
+    }
+    const priSel = document.getElementById("priority-select");
+    if (priSel) {
+      const pool = CursorAPI.coursePool();
+      const cur = CursorAPI.mainCourse();
+      priSel.innerHTML = `<option value="">不设主线（按紧迫度自动）</option>` +
+        pool.map(c => `<option value="${c}" ${c === cur ? "selected" : ""}>${CursorAPI.poolLabel(c)}</option>`).join("");
+      const save = document.getElementById("priority-save");
+      if (save) save.addEventListener("click", () => {
+        CursorAPI.setMainCourse(priSel.value);
+        alert("主线课程已保存，今日任务量已按新主线重排。");
+        renderPlan();
+      });
+    }
+    const reset = document.getElementById("sch-reset");
+    if (reset && !reset.dataset.bound) {
+      reset.dataset.bound = "1";
+      reset.addEventListener("click", () => {
+        if (!confirm("确定清空所有进度线本地记录？各课游标归零、完成记录清空，需重新校准。选科与主线设置保留。")) return;
+        ["course_cursor", "cursor_history", "skipped_units", "block_overrides", "day_log", "lesson_photos", "custom_blocks"].forEach(k => Store.set(k, k === "lesson_photos" || k === "custom_blocks" ? {} : (k === "day_log" ? { date: "", entries: [] } : {})));
+        alert("已清空。请逐科重新校准游标。");
+        renderPlan();
+      });
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     if (!document.getElementById("today-plan-root")) return;
     renderPlan();
+    renderSettings();
     renderCloudPanel();
     /* 跨设备互通：本机填过昵称时，进页先按昵称恢复云端最新进度 */
     if (Store.get("checkin_name", "").trim()) await restoreFromCloud(true);
