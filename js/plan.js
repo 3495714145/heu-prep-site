@@ -406,7 +406,7 @@
     }).join("");
     return `<div class="cursor-panel">
       <h3>学习进度游标</h3>
-      <p class="muted">今日任务由各课游标顺延生成，主线课任务量按「剩余单元 ÷ 距考天数」每天自动倒排；完成或跳过即自动前进。你学到哪里由你校准，网页只负责把计划排顺。</p>
+      <p class="muted">今日任务由各课游标顺延生成，主线课任务量按「剩余单元 ÷ 距考天数」每天自动倒排；每完成一课须提交该章节笔记照片，上传成功才自动前进（监视端同步可见），跳过则记入跳过。你学到哪里由你校准，网页只负责把计划排顺。</p>
       ${rows}
     </div>`;
   }
@@ -477,7 +477,9 @@
         ${ph ? `<div class="pl-photos"><a href="${ph.url}" target="_blank" rel="noopener" class="pl-photo-link"><img src="${ph.url}" alt="打卡笔记照片"></a><span class="muted pl-ts">笔记 ${ph.ts}</span><button class="btn small ghost" data-unphoto="${b.id}">撤回笔记</button></div>`
              : (st === "done" && doneAtOf(b) ? `<div class="muted pl-ts">打卡时间：${doneAtOf(b)}</div>` : "")}
         <div class="pl-actions">
-          ${st !== "done" ? `<button class="btn small" data-act="done" data-id="${b.id}">完成（100%）</button>` : `<button class="btn small ghost" data-act="reset" data-id="${b.id}">撤销完成</button>`}
+          ${st === "done" ? `<button class="btn small ghost" data-act="reset" data-id="${b.id}">撤销完成</button>`
+            : (CursorAPI.isUnitId(b.id) ? `<span class="muted pl-note-hint">📌 完成本任务必须提交章节笔记照片，上传成功后自动完成并推进进度</span>`
+            : `<button class="btn small" data-act="done" data-id="${b.id}">完成（100%）</button>`)}
           ${st !== "skipped" && st !== "done" ? `<button class="btn small ghost" data-act="skip" data-id="${b.id}">跳过</button>` : ""}
           <label class="btn small ghost pl-photo-btn">📷 笔记打卡<input type="file" accept="image/*" hidden data-photo="${b.id}"></label>
           ${v.custom ? `<button class="btn small ghost" data-delcustom="${b.id}">删除安排</button>` : ""}
@@ -493,6 +495,7 @@
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id, act = btn.dataset.act;
         const blk = items.find(v => v.block.id === id).block;
+        if (act === "done" && CursorAPI.isUnitId(id)) { alert("游标任务必须提交章节笔记照片才能完成：点「📷 笔记打卡」上传后自动完成并推进进度。"); return; }
         if (act === "done") setStatus(blk, "done");
         else if (act === "skip") setStatus(blk, "skipped", prompt("跳过原因（可选）：") || "");
         else setStatus(blk, "pending");
@@ -511,8 +514,15 @@
     /* 撤回笔记照片（本地记录立即删除并重新同步；ntfy 附件随历史消息约 12 小时自动过期） */
     root.querySelectorAll("button[data-unphoto]").forEach(btn => {
       btn.addEventListener("click", async () => {
-        if (!confirm("确定撤回该节打卡笔记照片？（监视端将立即不再显示）")) return;
-        recallPhoto(btn.dataset.unphoto);
+        if (!confirm("确定撤回该任务打卡笔记照片？（监视端将立即不再显示；游标任务将同时撤销完成并回退进度）")) return;
+        const uid = btn.dataset.unphoto;
+        recallPhoto(uid);
+        if (CursorAPI.isUnitId(uid)) {
+          const pu = CursorAPI.parseUnitId(uid);
+          const blk = items.find(v => v.block.id === uid).block;
+          if (blk) setStatus(blk, "pending");
+          if (CursorAPI.cursorOf(pu.code) === pu.idx + 1) CursorAPI.setCursor(pu.code, pu.idx);
+        }
         renderPlan();
         if (Store.get("cloud_auto", true) && Store.get("checkin_topic", "")) await pushCloud(true);
       });

@@ -17,12 +17,12 @@
 
   <section class="section container">
     <h2>今日学习计划 <button class="btn small ghost" id="plan-refresh" style="vertical-align:middle;">刷新</button></h2>
-    <p class="desc">由各课「进度游标」顺延生成：任务量按剩余单元 ÷ 距考天数自动倒排，顺序按考前完成率紧迫度自动排（最危险先学）；完成即自动前进，无需跟固定时段走。在本页下方「学习进度线」校准每门课学到哪了。</p>
+    <p class="desc">由各课「进度游标」顺延生成：任务量按剩余单元 ÷ 距考天数自动倒排，顺序按考前完成率紧迫度自动排（最危险先学）；每完成一课须提交该章节笔记照片，上传成功后自动前进（监视端实时可见），无需跟固定时段走。在本页下方「学习进度线」校准每门课学到哪了。</p>
     <div id="today-plan-root"><div class="notice info">正在生成今日计划…</div></div>
     <div class="grid grid-2" style="margin-top:18px;">
       <div class="card" id="pomo-card">
         <h3>番茄钟</h3>
-        <p class="muted">25 分钟专注 + 5 分钟休息（可调）。可关联一个科目或一个「今日游标任务」；完成后时长自动累加到该科目统计，关联游标任务时自动完成该任务并推进游标。</p>
+        <p class="muted">25 分钟专注 + 5 分钟休息（可调）。可关联一个科目或一个「今日游标任务」；完成后时长自动累加到该科目统计（游标任务仍需提交章节笔记照片才会推进进度）。</p>
         <div class="pomo-display" id="pomo-display">25:00</div>
         <div class="pomo-controls">
           <button class="btn" id="pomo-start">开始专注</button>
@@ -121,8 +121,8 @@
 <script src="js/cursor.js?v=20261107"></script>
 <script src="js/schedule.js?v=20261107"></script>
 <script src="_shared/js/echarts.min.js"></script>
-<script src="js/study.js?v=20261107"></script>
-<script src="js/plan.js?v=20261107"></script>
+<script src="js/study.js?v=20261108"></script>
+<script src="js/plan.js?v=20261108"></script>
   <script src="js/ai_float.js"></script>
 </body>
 </html>

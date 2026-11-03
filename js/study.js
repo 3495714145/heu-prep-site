@@ -49,20 +49,11 @@
     const today = fmtDate(new Date());
     (rec[today] = rec[today] || []).push({ target, min: len, at: new Date().toLocaleTimeString() });
     Store.set("pomodoro_log", rec);
-    /* 回写任务状态：今日游标任务完成即推进游标 */
-    if (target.startsWith("unit:")) {
-      const id = target.slice(5);
-      const ov = Store.get("block_overrides", {});
-      ov[id] = { status: "done", done_at: new Date().toLocaleString("zh-CN", { hour12: false }) };
-      Store.set("block_overrides", ov);
-      if (window.CursorAPI && CursorAPI.isUnitId(id)) {
-        const pu = CursorAPI.parseUnitId(id);
-        CursorAPI.markUnitDone(pu.code, pu.idx);
-      }
-    }
     /* 打卡进度自动累加 */
     bumpGoal("pomodoro", 1);
-    alert(`番茄钟完成（${len} 分钟），已计入学习统计。`);
+    alert(target.startsWith("unit:")
+      ? `番茄钟完成（${len} 分钟），已计入学习统计。\n注意：游标任务需提交章节笔记照片才会完成并推进进度，请回到今日计划点「📷 笔记打卡」。`
+      : `番茄钟完成（${len} 分钟），已计入学习统计。`);
     renderStats();
     renderGoals();
   }
