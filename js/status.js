@@ -25,7 +25,7 @@
           <span class="badge ${l.status === "done" ? "ok" : l.status === "skipped" ? "miss" : "warnb"}">${l.status === "done" ? "已完成" : l.status === "skipped" ? "已跳过" : "进行中/待完成"}</span>
         </div>
         <div class="prog"><div class="prog-fill" style="width:${l.status === "done" ? 100 : 0}%"></div></div>
-        ${(l.photos || []).length ? `<div class="pl-photos">${(l.photos || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt="打卡笔记照片"></a>`).join("")}<span class="muted pl-ts">点击查看笔记原图</span></div>` : ""}
+        ${(l.photos || []).length ? `<div class="pl-photos">${(l.photos || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener" class="pl-photo-link"><img src="${esc(u)}" alt="打卡笔记照片"></a>`).join("")}<span class="muted pl-ts">点击查看笔记原图</span></div>` : ""}
       </div>`).join("");
     root.innerHTML = `
       <div class="plan-summary">
@@ -68,5 +68,24 @@
     if (!document.getElementById("status-root")) return;
     connect();
     document.getElementById("status-refresh").addEventListener("click", connect);
+
+    /* 照片灯箱预览：点击缩略图页内放大 */
+    const lb = document.createElement("div");
+    lb.className = "lightbox";
+    lb.innerHTML = `<img alt="笔记照片预览"><button class="btn small lb-close">关闭 ✕</button>`;
+    lb.style.display = "none";
+    document.body.appendChild(lb);
+    lb.addEventListener("click", e => {
+      if (!e.target.closest("img")) { lb.style.display = "none"; lb.querySelector("img").src = ""; }
+    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") { lb.style.display = "none"; lb.querySelector("img").src = ""; } });
+    document.getElementById("status-root").addEventListener("click", e => {
+      const a = e.target.closest(".pl-photo-link");
+      if (a) {
+        e.preventDefault();
+        lb.querySelector("img").src = a.getAttribute("href");
+        lb.style.display = "flex";
+      }
+    });
   });
 })();

@@ -357,3 +357,11 @@ footer a { color: var(--accent); }
 .pl-photos { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .pl-photos img { width: 88px; height: 66px; object-fit: cover; border-radius: 8px; border: 1px solid var(--rule); }
 .pl-ts { font-size: 12px; }
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.78); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.lightbox img { max-width: 84vw; max-height: 80vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,.5); cursor: zoom-out; }
+.lb-close { position: absolute; top: 18px; right: 18px; z-index: 1; }
+.custom-form { border: 1px solid var(--rule); border-radius: 14px; padding: 12px 14px; margin: 12px 0 14px; display: flex; flex-direction: column; gap: 8px; background: var(--card-bg, #fff); }
+.custom-form input[type="text"] { flex: 1 1 220px; border: 1px solid var(--rule); border-radius: 980px; padding: 8px 14px; font-size: 14px; outline: none; }
+.custom-form input[type="text"]:focus { border-color: var(--accent); }
+.custom-form select { border: 1px solid var(--rule); border-radius: 980px; padding: 8px 12px; font-size: 14px; }
+.cf-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
