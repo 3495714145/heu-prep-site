@@ -2,8 +2,8 @@
 /* 仪表盘：今日学习计划（进度游标引擎 + 自定义安排；主线任务顺延推进，不绑时段）+ 笔记照片打卡/撤回 + 打卡云端监视（ntfy.sh 实时同步） */
 "use strict";
 (function () {
-  const S = window.ScheduleAPI;
   const CLOUD = "https://ntfy.sh";
+  const WEEKDAYS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
 
   function todayISO() {
     const d = new Date(); return fmtDate(d);
@@ -46,14 +46,14 @@
     Store.set("custom_blocks", m);
   }
 
-  /* ---------- 统一课程项（游标任务块 + 自定义块；主线在前，不绑具体时段） ---------- */
+  /* ---------- 统一课程项（游标任务块 + 自定义块；紧迫度优先顺序由引擎排好，自定义殿后） ---------- */
   function todayItems() {
     const items = [];
-    CursorAPI.todayUnitBlocks().forEach(b => {
+    CursorAPI.todayUnitBlocks().forEach((b, i) => {
       items.push({
         block: b, custom: false,
         time: `约${b.duration_min} 分钟`,
-        sortKey: (b._role === "main" ? "0" : "1") + b.id,
+        sortKey: String(i).padStart(2, "0"),
         timeLabel: b._role === "main" ? "主线任务" : "支线任务",
         label: `${CursorAPI.poolLabel(b.subject)} · ${b.content_title}`
       });
@@ -61,7 +61,7 @@
     customBlocksToday().forEach(b => {
       items.push({
         block: b, custom: true,
-        time: `${b.start}–${b.end}`, sortKey: "2" + b.start,
+        time: `${b.start}–${b.end}`, sortKey: "9" + b.start,
         timeLabel: "自定义时段",
         label: `${b.subject} · ${b.content_title}`
       });
@@ -441,7 +441,7 @@
 
     const head = `
       <div class="plan-summary">
-        <div class="plan-date">${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${S.WEEKDAYS[(now.getDay() + 6) % 7]}</div>
+        <div class="plan-date">${now.getMonth() + 1} 月 ${now.getDate()} 日 · ${WEEKDAYS[(now.getDay() + 6) % 7]}</div>
         <div style="display:flex;align-items:center;gap:12px;">
           <button class="btn small ghost" id="custom-add">＋ 自定义安排</button>
           <div class="plan-pct">${pct}%<small>（${done}/${items.length} 项${skipped ? ` · 跳过 ${skipped}` : ""}）</small></div>
@@ -452,7 +452,7 @@
       ${customFormHtml()}`;
 
     if (!items.length) {
-      root.innerHTML = head + `<div class="notice empty"><strong>今天没有游标任务与自定义安排。</strong>可到<a href="schedule.html">进度页</a>选择课程合集，或在上方「学习进度游标」里校准每门课学到哪了，也可点「＋ 自定义安排」添加今日任务。</div>`;
+      root.innerHTML = head + `<div class="notice empty"><strong>今天没有游标任务与自定义安排。</strong>可在上方「学习进度游标」里校准每门课学到哪了（或在本页下方「学习进度线」选择课程合集），也可点「＋ 自定义安排」添加今日任务。</div>`;
       bindCustomButtons(root);
       bindCursorControls(root);
       return;

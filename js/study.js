@@ -16,25 +16,11 @@
     });
     opts.push({ value: "subject:kaoyan:数二", label: "[考研] 数学（二）" });
     opts.push({ value: "subject:kaoyan:英二", label: "[考研] 英语（二）" });
-    /* 今日课表块 */
-    const todayISO = fmtDate(new Date());
-    const wkStart = mondayOf(new Date());
-    const weekIdx = Math.round((wkStart - mondayOf(new Date(SITE_DATA.meta.built_at + "T00:00:00"))) / (7 * 86400000));
+    /* 今日游标任务（完成番茄钟即自动完成该任务并推进游标） */
     try {
-      const sel = Store.get("zk_subjects", []);
-      if (sel.length >= 2) {
-        SITE_DATA.zikao.courses.filter(c => sel.includes(c.code)).forEach(c => {
-          const chs = c.chapters || (c.reference_chapters && c.reference_chapters.chapters) || [];
-          chs.slice(0, 1).forEach(() => {
-            opts.push({ value: `block:zk-${c.code}-w${weekIdx}-b0`, label: `[课表块] ${c.code} ${c.name}（本周块 1）` });
-          });
-        });
-      }
-      SITE_DATA.kaoyan.exam408.subjects.forEach(s => {
-        opts.push({ value: `block:ky-${todayISO}-morning-${s.code}`, label: `[课表块] 今日上午 408·${s.name}` });
+      (window.CursorAPI ? CursorAPI.todayUnitBlocks() : []).forEach(b => {
+        opts.push({ value: "unit:" + b.id, label: `[今日] ${CursorAPI.poolLabel(b.subject)} · ${b.content_title}` });
       });
-      opts.push({ value: `block:ky-${todayISO}-morning-数二`, label: "[课表块] 今日上午 数学（二）" });
-      opts.push({ value: `block:ky-${todayISO}-evening-英二`, label: "[课表块] 今日晚上 英语（二）" });
     } catch (e) {}
     return opts;
   }
@@ -63,12 +49,16 @@
     const today = fmtDate(new Date());
     (rec[today] = rec[today] || []).push({ target, min: len, at: new Date().toLocaleTimeString() });
     Store.set("pomodoro_log", rec);
-    /* 回写课表块状态 */
-    if (target.startsWith("block:")) {
-      const id = target.slice(6);
+    /* 回写任务状态：今日游标任务完成即推进游标 */
+    if (target.startsWith("unit:")) {
+      const id = target.slice(5);
       const ov = Store.get("block_overrides", {});
-      ov[id] = { status: "done" };
+      ov[id] = { status: "done", done_at: new Date().toLocaleString("zh-CN", { hour12: false }) };
       Store.set("block_overrides", ov);
+      if (window.CursorAPI && CursorAPI.isUnitId(id)) {
+        const pu = CursorAPI.parseUnitId(id);
+        CursorAPI.markUnitDone(pu.code, pu.idx);
+      }
     }
     /* 打卡进度自动累加 */
     bumpGoal("pomodoro", 1);
@@ -142,10 +132,21 @@
       if (d < wkStart) return;
       list.forEach(p => {
         if (!p.target) return;
-        const parts = p.target.split(":");
-        const track = parts[1], subj = parts[2];
+        let track, subj;
+        if (p.target.startsWith("unit:")) {
+          /* 游标任务：u-<code>-<idx>，按课程归属计入对应 track */
+          const pu = (window.CursorAPI && CursorAPI.isUnitId(p.target.slice(5))) ? CursorAPI.parseUnitId(p.target.slice(5)) : null;
+          if (!pu) return;
+          track = ["数二", "英二", "408"].includes(pu.code) ? "kaoyan" : "zikao";
+          subj = pu.code;
+        } else if (p.target.startsWith("block:") || p.target.startsWith("rv-")) {
+          return; /* 旧课表块与复盘块不计入科目时长 */
+        } else {
+          const parts = p.target.split(":");
+          track = parts[1], subj = parts[2];
+        }
         if (track === "zikao") zkMap[subj] = (zkMap[subj] || 0) + (p.min || 0);
-        else kyMap[subj] = (kyMap[subj] || 0) + (p.min || 0);
+        else if (track === "kaoyan") kyMap[subj] = (kyMap[subj] || 0) + (p.min || 0);
       });
     });
     const zkLabels = Object.keys(zkMap), kyLabels = Object.keys(kyMap);

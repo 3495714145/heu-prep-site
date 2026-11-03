@@ -213,22 +213,29 @@
     const c = SITE_DATA.zikao.courses.find(x => x.code === code);
     return c ? `${c.code} ${c.name}` : code;
   }
-  /* 今日全部游标任务块：主线 N 个 + 各支线 1 个 */
+  /* 今日全部游标任务块：主线 N 个 + 各支线 1 个；
+     排序为紧迫度优先：考前完成率低的课排最前（最危险先学），并列时主线课优先 */
   function todayUnitBlocks() {
     const plan = todayQuota();
     if (!plan.main) return [];
-    const blocks = [];
+    const groups = [];
     const pushCourse = (code, role, n) => {
       const units = unitsOf(code);
       const cur = cursorOf(code);
+      const blocks = [];
       for (let i = 0; i < n; i++) {
         const u = units[cur + i];
         blocks.push(u ? unitBlock(u, role) : reviewBlock(code, role));
       }
+      const f = forecast(code);
+      groups.push({ code, blocks, key: f.percentByExam === null ? 101 : f.percentByExam });
     };
     pushCourse(plan.main, "main", plan.mainQuota);
     plan.sides.forEach(s => pushCourse(s.code, "side", s.quota));
-    return blocks;
+    groups.sort((a, b) => a.key - b.key || (a.code === plan.main ? -1 : b.code === plan.main ? 1 : 0));
+    const out = [];
+    groups.forEach(g => out.push(...g.blocks));
+    return out;
   }
 
   window.CursorAPI = {

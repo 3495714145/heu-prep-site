@@ -33,7 +33,6 @@ const NAV_ITEMS = [
   { href: "materials.html", label: "考前资料" },
   { href: "math.html", label: "高中数学" },
   { href: "timeline.html", label: "时间线" },
-  { href: "schedule.html", label: "学习进度" },
   { href: "quiz.html", label: "刷题与错题" },
   { href: "study.html", label: "我的学习" }
 ];
