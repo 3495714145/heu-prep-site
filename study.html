@@ -5,19 +5,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的学习 · Yyy</title>
-<link rel="stylesheet" href="css/style.css?v=20261105">
+<link rel="stylesheet" href="css/style.css?v=20261106">
 </head>
 <body>
 <header class="nav" id="site-nav"></header>
 <main>
   <section class="hero container">
     <h1>我的学习</h1>
-    <p class="sub">今日学习计划、番茄钟、学习数据看板、Anki 卡片导出、打卡与云端监视。课表与统计存于本地浏览器；打卡监视为自愿开启的公开同步。</p>
+    <p class="sub">今日学习计划、番茄钟、学习数据看板、Anki 卡片导出、打卡与云端监视。进度游标与统计存于本地浏览器；打卡监视为自愿开启的公开同步。</p>
   </section>
 
   <section class="section container">
     <h2>今日学习计划 <button class="btn small ghost" id="plan-refresh" style="vertical-align:middle;">刷新</button></h2>
-    <p class="desc">按<a href="schedule.html">课表</a>当日节次排序，每节课 = 一个章节小节进度单元：「今天要完成：XX课XX章XX知识点」。完成状态与课表页互通。</p>
+    <p class="desc">由各课「进度游标」顺延生成：主线课任务量按剩余单元 ÷ 距考天数自动倒排，支线课每天各 1 个小任务；完成即自动前进，无需跟固定时段走。在<a href="schedule.html">学习进度页</a>校准每门课学到哪了。</p>
     <div id="today-plan-root"><div class="notice info">正在生成今日计划…</div></div>
     <div class="grid grid-2" style="margin-top:18px;">
       <div class="card" id="pomo-card">
@@ -83,11 +83,12 @@
 </main>
 <footer id="site-footer"></footer>
 <script src="js/data.js"></script>
-<script src="js/common.js?v=20261105"></script>
-<script src="js/schedule.js"></script>
+<script src="js/common.js?v=20261106"></script>
+<script src="js/cursor.js?v=20261106"></script>
+<script src="js/schedule.js?v=20261106"></script>
 <script src="_shared/js/echarts.min.js"></script>
 <script src="js/study.js"></script>
-<script src="js/plan.js?v=20261105"></script>
+<script src="js/plan.js?v=20261106"></script>
   <script src="js/ai_float.js"></script>
 </body>
 </html>
