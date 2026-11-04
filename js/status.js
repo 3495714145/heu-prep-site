@@ -6,6 +6,15 @@
 (function () {
   const CLOUD = "https://ntfy.sh";
   let es = null;
+  let catchupTimer = null;
+  /* 同名快照只接受更新的（updated_at 大者优先），防止乱序到达导致回退 */
+  function setProfile(snap) {
+    const key = snap.name || "匿名学习者";
+    const old = profiles.get(key);
+    if (old && String(old.updated_at || "") >= String(snap.updated_at || "")) return false;
+    profiles.set(key, snap);
+    return true;
+  }
   /* profiles: Map(name -> 快照对象)，仅保留每人最新一条 */
   const profiles = new Map();
 
@@ -74,7 +83,7 @@
           const m = JSON.parse(line);
           if (m.event !== "message" || !m.message) return;
           const snap = JSON.parse(m.message);
-          if (snap && snap.app === "yyy-prep-checkin") profiles.set(snap.name || "匿名学习者", snap);
+          if (snap && snap.app === "yyy-prep-checkin") setProfile(snap);
         } catch (e) { /* 跳过坏行 */ }
       });
       if (profiles.size) render();
@@ -101,13 +110,15 @@
           if (m.event !== "message" || !m.message) return;
           const snap = JSON.parse(m.message);
           if (snap && snap.app === "yyy-prep-checkin") {
-            profiles.set(snap.name || "匿名学习者", snap);
-            render();
+            if (setProfile(snap)) render();
           }
         } catch (e) { /* 非打卡消息忽略 */ }
       };
       es.onerror = () => {
         meta.textContent = "实时连接断开/失败，自动重连中…（多为当前网络无法直连 ntfy.sh，可切换网络后点「立即刷新」）";
+        /* 断线期间的快照可能漏收：稍等片刻主动补拉一次 */
+        if (catchupTimer) clearTimeout(catchupTimer);
+        catchupTimer = setTimeout(() => { if (es && es.readyState === EventSource.CLOSED) fetchOnce(); }, 4000);
       };
     } catch (e) { /* 查询阶段已展示错误提示 */ }
   }
@@ -215,6 +226,11 @@
       maybeLottery();
     });
     if (refresh) refresh.addEventListener("click", doQuery);
+
+    /* 手机锁屏/切后台后 SSE 可能静默中断：回到前台立即补拉最新快照（仅已查询过的页面） */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && es) fetchOnce();
+    });
 
     /* 照片灯箱预览：点击缩略图页内放大 */
     const lb = document.createElement("div");

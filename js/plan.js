@@ -719,6 +719,10 @@
     if (Store.get("cloud_auto", true)) pushCloud(true);
     /* 抽奖动态：实时接收监视端抽奖结果 */
     connectLottery();
+    /* 补推：打卡时若推送失败（网络抖动/息屏），回到前台自动补推一次，保证监视端及时看到 */
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && Store.get("cloud_auto", true)) pushCloud(true);
+    });
     const refresh = document.getElementById("plan-refresh");
     if (refresh) refresh.addEventListener("click", renderPlan);
   });
