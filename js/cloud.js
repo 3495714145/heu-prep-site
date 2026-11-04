@@ -89,25 +89,40 @@
     syncing = true;
     setStatusUi("<span class=\"badge warnb\">同步中…</span>");
     try {
-      const remote = await ghGet(remotePath());
-      const remoteDoc = remote ? (() => { try { return JSON.parse(remote.text); } catch (e) { return null; } })() : null;
-      const rKeys = (remoteDoc && remoteDoc.keys) || {}, rTs = (remoteDoc && remoteDoc.ts) || {};
-      const lTs = localTs();
-      /* 合并：按键比较时间戳，新者胜 */
-      const mergedKeys = Object.assign({}, collectLocal());
       let pulled = false;
-      SYNC_KEYS.forEach(k => {
-        if (rKeys[k] === undefined) return;
-        if (!lTs[k] || (rTs[k] && String(rTs[k]) > String(lTs[k]))) { mergedKeys[k] = rKeys[k]; pulled = true; }
-      });
-      if (pulled) { applyKeys(mergedKeys); }
-      /* 时间戳取两边较新者 */
-      const mergedTs = Object.assign({}, lTs);
-      SYNC_KEYS.forEach(k => { if (rTs[k] && (!mergedTs[k] || String(rTs[k]) > String(mergedTs[k]))) mergedTs[k] = rTs[k]; });
-      stampAll();
-      SYNC_KEYS.forEach(k => { if (mergedTs[k] && String(mergedTs[k]) > String(localTs()[k] || "")) { const t = localTs(); t[k] = mergedTs[k]; Store.set("gh_ts", t); } });
-      const doc = { app: "yyy-prep-cloud", updated_at: new Date().toISOString(), ts: localTs(), keys: mergedKeys };
-      await ghPut(remotePath(), JSON.stringify(doc, null, 1), "sync: " + doc.updated_at, remote && remote.sha);
+      /* 整个「拉取→合并→推送」作为一轮；遇 409 冲突（另一设备刚写过）自动重来，最多 3 轮 */
+      for (let attempt = 0; ; attempt++) {
+        const remote = await ghGet(remotePath());
+        const remoteDoc = remote ? (() => { try { return JSON.parse(remote.text); } catch (e) { return null; } })() : null;
+        const rKeys = (remoteDoc && remoteDoc.keys) || {}, rTs = (remoteDoc && remoteDoc.ts) || {};
+        const lTs = localTs();
+        /* 合并：按键比较时间戳，新者胜 */
+        const mergedKeys = Object.assign({}, collectLocal());
+        pulled = false;
+        SYNC_KEYS.forEach(k => {
+          if (rKeys[k] === undefined) return;
+          if (!lTs[k] || (rTs[k] && String(rTs[k]) > String(lTs[k]))) { mergedKeys[k] = rKeys[k]; pulled = true; }
+        });
+        if (pulled) { applyKeys(mergedKeys); }
+        /* 时间戳取两边较新者 */
+        const mergedTs = Object.assign({}, lTs);
+        SYNC_KEYS.forEach(k => { if (rTs[k] && (!mergedTs[k] || String(rTs[k]) > String(mergedTs[k]))) mergedTs[k] = rTs[k]; });
+        stampAll();
+        SYNC_KEYS.forEach(k => { if (mergedTs[k] && String(mergedTs[k]) > String(localTs()[k] || "")) { const t = localTs(); t[k] = mergedTs[k]; Store.set("gh_ts", t); } });
+        const doc = { app: "yyy-prep-cloud", updated_at: new Date().toISOString(), ts: localTs(), keys: mergedKeys };
+        try {
+          await ghPut(remotePath(), JSON.stringify(doc, null, 1), "sync: " + doc.updated_at, remote && remote.sha);
+          break;
+        } catch (e) {
+          /* 409 = 云端已被别的同步抢先更新：等一下重新拉取合并再推 */
+          if (attempt < 2 && String(e.message).includes("409")) {
+            setStatusUi("<span class=\"badge warnb\">云端冲突，自动重试…</span>");
+            await new Promise(r => setTimeout(r, 900));
+            continue;
+          }
+          throw e;
+        }
+      }
       setStatusUi(`<span class="badge ok">云端已同步</span> <span class="muted">${new Date().toLocaleTimeString("zh-CN", { hour12: false })}${pulled ? " · 已合并云端进度" : ""}</span>`);
       if (pulled && window.PlanAPI && PlanAPI.renderPlan) PlanAPI.renderPlan();
       return true;
