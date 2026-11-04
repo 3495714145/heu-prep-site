@@ -87,8 +87,7 @@
       </div>
       <div class="card">
         <h3>云存档（GitHub，免费）</h3>
-        <p class="muted">配置后：学习进度存仓库 progress.json（换设备/清缓存不丢、多设备自动合并），笔记照片存仓库 images/（jsDelivr 展示，永久保存，不再 12 小时过期）。<br>
-        步骤：GitHub 新建一个空仓库（建议私有）→ Settings → Developer settings → Personal access tokens → Fine-grained tokens → 新建，仅勾选该仓库的 <b>Contents: Read and write</b> → 把「用户名/仓库名」和 Token 填在下面。</p>
+        <p class="muted">已内置云存档配置，无需填写即可使用：学习进度存仓库 progress.json（换设备/清缓存不丢、多设备自动合并），笔记照片存仓库 images/（jsDelivr 展示，永久保存，不再 12 小时过期）。下方输入框仅用于更换仓库或 Token。</p>
         <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
           <input id="gh-repo" placeholder="用户名/仓库名，例如 yyy/prep-data" autocomplete="off">
           <input id="gh-token" type="password" placeholder="Fine-grained Token（github_pat_…）" autocomplete="off">
@@ -137,7 +136,7 @@
 <script src="js/cursor.js?v=20261114"></script>
 <script src="_shared/js/echarts.min.js"></script>
 <script src="js/study.js?v=20261111"></script>
-<script src="js/cloud.js?v=20261116"></script>
+<script src="js/cloud.js?v=20261117"></script>
 <script src="js/plan.js?v=20261117"></script>
   <script src="js/ai_float.js"></script>
 </body>

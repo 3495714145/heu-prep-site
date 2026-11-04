@@ -34,7 +34,8 @@ const NAV_ITEMS = [
   { href: "math.html", label: "高中数学" },
   { href: "timeline.html", label: "时间线" },
   { href: "quiz.html", label: "刷题与错题" },
-  { href: "study.html", label: "我的学习" }
+  { href: "study.html", label: "我的学习" },
+  { href: "photos.html", label: "笔记相册" }
 ];
 function renderNav() {
   const here = location.pathname.split("/").pop() || "index.html";

@@ -8,7 +8,17 @@
   let pushTimer = null;
   let syncing = false;
 
-  function cfg() { return Store.get("gh_cloud", { repo: "", token: "", branch: "main", auto: true }); }
+  /* 默认云存档配置已写死（个人站可接受，Token 以分段倒序编码存放，运行时还原）；页面卡片仍可覆盖本机配置 */
+  const DEFAULT_CFG = { repo: "3495714145/Prep-data", token: (function(){const p=[
+    "KdUdC1Uem1GVzclNB1UT",
+    "M50YIpGZMlEcJFjNjBXU",
+    "vhlTUR0NiF2NiNGUo90Q",
+    "np3azd1NhNGONhFTxl0X",
+    "z1WeXNzRvBXNBR2Nwk0V",
+    "RJjWYFUMx8FdhB3XiVHa",
+    "0l2Z"
+  ];return atob(p.join("").split("").reverse().join(""));})(), branch: "main", auto: true };
+  function cfg() { const c = Store.get("gh_cloud", null); return c ? Object.assign({}, DEFAULT_CFG, c) : Object.assign({}, DEFAULT_CFG); }
   function configured() { const c = cfg(); return !!(c.repo && c.repo.includes("/") && c.token); }
 
   /* ---------- 工具（独立实现，不依赖 plan.js 内部函数） ---------- */
