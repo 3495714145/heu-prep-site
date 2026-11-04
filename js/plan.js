@@ -22,6 +22,7 @@
         : (ov[b.id] && ov[b.id].done_at) || ""
     };
     Store.set("block_overrides", ov);
+    if (window.CloudAPI) CloudAPI.queuePush();
   }
   function doneAtOf(b) {
     const ov = Store.get("block_overrides", {});
@@ -106,11 +107,13 @@
     const m = Store.get("lesson_photos", {});
     m[id] = { date: todayISO(), url, ts: new Date().toLocaleString("zh-CN", { hour12: false }) };
     Store.set("lesson_photos", m);
+    if (window.CloudAPI) CloudAPI.queuePush();
   }
   function recallPhoto(id) {
     const m = Store.get("lesson_photos", {});
     delete m[id];
     Store.set("lesson_photos", m);
+    if (window.CloudAPI) CloudAPI.queuePush();
   }
   function compressImage(file) {
     return new Promise((res, rej) => {
@@ -612,7 +615,11 @@
         try {
           if (st) st.textContent = "笔记照片上传中…";
           const blob = await compressImage(f);
-          const url = await uploadPhoto(todayTopic(), blob, "note-" + id.replace(/[^a-zA-Z0-9]/g, "") + "-" + Date.now() + ".jpg");
+          const fname = "note-" + id.replace(/[^a-zA-Z0-9]/g, "") + "-" + Date.now() + ".jpg";
+          /* 已配置云存档时走 GitHub 图床（永久保存），否则走 ntfy（12 小时） */
+          const url = (window.CloudAPI && CloudAPI.configured())
+            ? await CloudAPI.uploadImage(blob, fname)
+            : await uploadPhoto(todayTopic(), blob, fname);
           setPhoto(id, url);
           if (blk) setStatus(blk, "done");
           if (blk && CursorAPI.isUnitId(id)) {

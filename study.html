@@ -85,6 +85,21 @@
         <p class="muted">清空游标与完成记录，各课进度归零重新校准；选科与合集保留。</p>
         <button class="btn small ghost" id="sch-reset" style="margin-top:8px;">清空所有进度线本地记录</button>
       </div>
+      <div class="card">
+        <h3>云存档（GitHub，免费）</h3>
+        <p class="muted">配置后：学习进度存仓库 progress.json（换设备/清缓存不丢、多设备自动合并），笔记照片存仓库 images/（jsDelivr 展示，永久保存，不再 12 小时过期）。<br>
+        步骤：GitHub 新建一个空仓库（建议私有）→ Settings → Developer settings → Personal access tokens → Fine-grained tokens → 新建，仅勾选该仓库的 <b>Contents: Read and write</b> → 把「用户名/仓库名」和 Token 填在下面。</p>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+          <input id="gh-repo" placeholder="用户名/仓库名，例如 yyy/prep-data" autocomplete="off">
+          <input id="gh-token" type="password" placeholder="Fine-grained Token（github_pat_…）" autocomplete="off">
+          <label style="font-size:13px;"><input type="checkbox" id="gh-auto" checked> 自动同步（打卡/校准后 4 秒自动推云端，打开页面自动合并）</label>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn small" id="gh-save">保存云存档配置</button>
+          <button class="btn small ghost" id="gh-sync">立即同步</button>
+        </div>
+        <p id="gh-status" style="margin-top:8px;"></p>
+      </div>
     </div>
   </section>
 
@@ -122,7 +137,8 @@
 <script src="js/cursor.js?v=20261114"></script>
 <script src="_shared/js/echarts.min.js"></script>
 <script src="js/study.js?v=20261111"></script>
-<script src="js/plan.js?v=20261116"></script>
+<script src="js/cloud.js?v=20261116"></script>
+<script src="js/plan.js?v=20261117"></script>
   <script src="js/ai_float.js"></script>
 </body>
 </html>
