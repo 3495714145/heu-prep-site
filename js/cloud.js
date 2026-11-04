@@ -7,6 +7,24 @@
   const SYNC_KEYS = ["course_cursor", "cursor_history", "skipped_units", "block_overrides", "day_log", "custom_blocks", "zk_subjects", "ky_subjects", "main_course", "lesson_photos"];
   let pushTimer = null;
   let syncing = false;
+  let missedPush = false;
+  const tabId = Math.random().toString(36).slice(2) + String(Date.now() % 10000);
+
+  /* ---------- 跨标签页互斥锁：同一浏览器同时只允许一个页面做同步（否则两个页面互相 409） ---------- */
+  function getLock() {
+    try {
+      const l = JSON.parse(localStorage.getItem("heuprep:sync_lock") || "null");
+      if (l && l.id !== tabId && Date.now() - l.ts < 8000) return false;
+      localStorage.setItem("heuprep:sync_lock", JSON.stringify({ id: tabId, ts: Date.now() }));
+      return true;
+    } catch (e) { return true; }
+  }
+  function releaseLock() {
+    try {
+      const l = JSON.parse(localStorage.getItem("heuprep:sync_lock") || "null");
+      if (!l || l.id === tabId) localStorage.removeItem("heuprep:sync_lock");
+    } catch (e) {}
+  }
 
   /* 默认云存档配置已写死（个人站可接受，Token 以分段倒序编码存放，运行时还原）；页面卡片仍可覆盖本机配置 */
   const DEFAULT_CFG = { repo: "3495714145/Prep-data", token: (function(){const p=[
@@ -85,12 +103,12 @@
   async function syncNow(silent) {
     const c = cfg();
     if (!configured()) { if (!silent) alert("请先填写仓库名与 Token。"); return false; }
-    if (syncing) return false;
+    if (syncing || !getLock()) { missedPush = true; return false; }
     syncing = true;
     setStatusUi("<span class=\"badge warnb\">同步中…</span>");
     try {
       let pulled = false;
-      /* 整个「拉取→合并→推送」作为一轮；遇 409 冲突（另一设备刚写过）自动重来，最多 3 轮 */
+      /* 整个「拉取→合并→推送」作为一轮；遇 409 冲突（另一设备刚写过）指数退避重试，最多 5 轮 */
       for (let attempt = 0; ; attempt++) {
         const remote = await ghGet(remotePath());
         const remoteDoc = remote ? (() => { try { return JSON.parse(remote.text); } catch (e) { return null; } })() : null;
@@ -114,10 +132,11 @@
           await ghPut(remotePath(), JSON.stringify(doc, null, 1), "sync: " + doc.updated_at, remote && remote.sha);
           break;
         } catch (e) {
-          /* 409 = 云端已被别的同步抢先更新：等一下重新拉取合并再推 */
-          if (attempt < 2 && String(e.message).includes("409")) {
-            setStatusUi("<span class=\"badge warnb\">云端冲突，自动重试…</span>");
-            await new Promise(r => setTimeout(r, 900));
+          /* 409 = 云端已被别的同步抢先更新：退避后重新拉取合并再推 */
+          if (attempt < 4 && String(e.message).includes("409")) {
+            const wait = 1000 * Math.pow(2, attempt);
+            setStatusUi(`<span class="badge warnb">云端冲突，${(wait / 1000).toFixed(0)} 秒后自动重试…</span>`);
+            await new Promise(r => setTimeout(r, wait));
             continue;
           }
           throw e;
@@ -131,7 +150,12 @@
       setStatusUi(`<span class="badge miss">同步失败</span> <span class="muted">${escHtml(msg)}</span>`);
       if (!silent) alert("云存档同步失败：" + msg);
       return false;
-    } finally { syncing = false; }
+    } finally {
+      syncing = false;
+      releaseLock();
+      /* 同步期间又被跳过的变更：稍后自动补推一次 */
+      if (missedPush) { missedPush = false; setTimeout(() => syncNow(true), 2000); }
+    }
   }
 
   /* 防抖自动推：打卡/照片/校准等变动后 4 秒统一推一次 */
@@ -178,7 +202,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bindUi();
-    if (configured() && cfg().auto !== false) syncNow(true);
+    /* CLOUD_NO_AUTOSYNC = true 的页面（如笔记相册，只读）不做启动自动同步 */
+    if (configured() && cfg().auto !== false && !window.CLOUD_NO_AUTOSYNC) syncNow(true);
   });
 
   window.CloudAPI = { configured, cfg, syncNow, queuePush, uploadImage };
